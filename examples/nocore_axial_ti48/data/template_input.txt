@@ -1,0 +1,31 @@
+General parameters
+------------------
+Physics case studied          0
+Algorithm to solve HWG eq.    0
+Normalization of matrices     1
+Remove states giving ev<0     1
+Convergence analysis (norm)   0
+Max(E_exc) displayed (Mev)    15  
+
+Quantum numbers
+---------------
+Number of active protons  Z   22  
+Number of active neutrons N   26  
+Number of core protons  Zc    0   
+Number of core neutrons Nc    0   
+Angular momentum min(2*J)     0    
+Angular momentum max(2*J)     8  
+Parity min(P)                 1 
+Parity max(P)                 1 
+Electric charge protons  (*e) 1.00
+Electric charge neutrons (*e) 0.00
+
+Cut-offs         
+--------
+Maximum number of states      0 
+Cut-off projected overlap     1.000E-04
+Cut-off norm eigenvalues      1.000E-06
+Cut-off negative eigenvalues  1.000E-10
+Cut-off expect. val. Jz/J^2   1.000E-03
+Cut-off expect. val. N/Z/A    1.000E-01
+No. of specialized cut offs   0

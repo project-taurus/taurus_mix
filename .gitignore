@@ -1,0 +1,9 @@
+wrk/
+exe/
+doc/*aux
+doc/*log
+doc/*out
+examples/nocore_axial_ti48/wrk
+examples/nocore_axial_ti48/out
+examples/sdshell_triaxial_mg24/wrk
+examples/sdshell_triaxial_mg24/out

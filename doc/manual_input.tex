@@ -1,0 +1,292 @@
+%=======================================================================
+% Manual concerning the format of the hamiltonian files.
+%=======================================================================
+%
+%= Document class, packages and commands ===============================
+%
+\documentclass[a4paper,11pt]{article}
+%
+\usepackage[left=2.0cm,right=2.0cm,top=2.0cm,bottom=2.0cm,includefoot,includehead,headheight=13.6pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage[colorlinks,urlcolor=blue,linkcolor=blue]{hyperref}
+
+\newcommand{\TAURUSpav}{$\text{TAURUS}_{\text{pav}}$}
+\newcommand{\TAURUSmix}{$\text{TAURUS}_{\text{mix}}$}
+\newcommand{\TAURUSmixt}{$\text{TAURUS}_{\text{mix}}$~}
+\newcommand{\ttt}[1]{\texttt{#1}}
+
+\newcommand{\bra}[1]{\langle #1 \vert}
+\newcommand{\ket}[1]{\vert #1 \rangle}
+\newcommand{\elma}[3]{\bra{#1} #2 \ket{#3}}
+
+% 
+% 
+%= Begin document ======================================================
+%
+\begin{document}
+
+%
+%= Title =======================================
+% 
+\begin{center}
+ {\LARGE \textbf{\TAURUSmix: Manual for the input files}} \\[0.20cm]
+ {\large 14/05/2023}
+\end{center}
+
+%
+%= Section: standard input =============================================
+% 
+\section{Structure of the standard input file}
+
+The input file is read by the code as STDIN and therefore has no fixed naming convention. 
+On the other hand, the format of the file is fixed. We describe in this manual how to write a proper input file for \TAURUSmix~
+and the different options that the code offers.
+We will present the different section of the input file separately (but remember that they
+are all part of the same file).
+ 
+\noindent Before going further, a few remark are in order:
+\begin{itemize}
+  \item We use here the Fortran convention for the format of variables, e.g.\ 1i5 or 1a30, assuming that the reader
+  know their meaning. If it is not the case, we encourage the reader to search for a tutorial somewhere else.
+  There is a large body of Fortran documentation available online therefore it should not be too difficult.
+
+  \item All lines starts with the reading of an element of an array, \ttt{input\_names} or \ttt{input\_spec},
+  made of \ttt{character(30)} variables. 
+  These variables only play a cosmetic/descriptive role when reading or printing the input parameters and can be
+  set to any desired value by the user. Therefore, we are not going to comment them further.
+
+  \item The number of lines in the input files depends on the number of ``specific'' cut-offs used. Here, we will give
+  the line numbers considering two specific cut-offs.
+\end{itemize}
+
+%
+%= subsection: general parameters ======================================
+%
+\subsection{Section about the general parameters}
+
+\subsubsection*{Description}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+Line & Format & Data \\
+\hline
+ \textbf{1}   & 1a             & \tt input\_names(1)                   \\
+ \textbf{2}   & 1a             & \tt input\_names(2)                   \\
+ \textbf{3}   & 1a30, 1i1      & \tt input\_names(3), hwg\_phys        \\
+ \textbf{4}   & 1a30, 1i1      & \tt input\_names(4), hwg\_algo        \\
+ \textbf{5}   & 1a30, 1i1      & \tt input\_names(5), hwg\_norm        \\
+ \textbf{6}   & 1a30, 1i1      & \tt input\_names(6), hwg\_rmev        \\
+ \textbf{7}   & 1a30, 1i1      & \tt input\_names(7), hwg\_conv        \\
+ \textbf{8}   & 1a30, 1i3      & \tt input\_names(8), hwg\_Edis        \\
+ \textbf{9}   & 1a             & \tt input\_names(9)                   \\
+\hline
+\end{tabular}
+\end{center}
+where 
+\begin{itemize}
+\item \ttt{hwg\_phys}: physical case studied. \\[0.05cm]
+ \ttt{= 0\:} excitation spectrum and $\gamma$ spectrosocpy (ELM transiions: E0-3, M1-2). 
+\item \ttt{hwg\_algo}: algorithm used to solve the HWG equation. \\[0.05cm]
+ \ttt{= 0\:} reduction to a standard eigenvalue problem through the calculation of the square root of the norm matrix. \\[0.05cm]
+ \ttt{= 1\:} QZ algorithm (as implemented in LAPACK).
+\item \ttt{hwg\_norm}: option to normalize the projected matrix elements before solving the HWG equation. \\[0.05cm]
+ \ttt{= 0\:} no normalization is performed. \\[0.05cm]
+ \ttt{= 1\:} normalization using the projected overlaps.
+\item \ttt{hwg\_rmev}: option to remove the projected states giving large negative eigenvalues, i.e.\ smaller than -\ttt{cutoff\_algo}, determined from incremental
+  diagonalization of the norm. Only referenced for \ttt{hwg\_algo = 0}. \\[0.05cm]
+ \ttt{= 0\:} no removal is performed. \\[0.05cm]
+ \ttt{= 1\:} removes the projected states.
+\item \ttt{hwg\_conv}: option to perform an anlysis of the convergence as a function of the number of norm eigenvalues considered. Only referenced for \ttt{hwg\_algo = 0}. \\[0.05cm]
+ \ttt{= 0\:} no analysis is performed. \\[0.05cm]
+ \ttt{= 1\:} For each $J^p$ block, the HWG equation is solved several times incrementally adding more norm eigenvalues. The results
+\item \ttt{hwg\_Edis}: Maximum exictation energy displayed in the final tables containing the information on the spectrum and transitions.
+ Note that separate files are created that contain the spectrum/transitions up to much higher excitation energy. 
+\end{itemize}
+
+\subsubsection*{Example}
+\begin{center}
+\tt
+\begin{tabular}{|ll|}
+\hline
+General parameters            &     \\
+------------------------------------ & \\
+Physics case studied          &0    \\
+Algorithm to solve HWG eq.    &0    \\
+Normalization of matrices     &1    \\
+Remove states giving ev<0     &1    \\
+Convergence analysis (norm)   &0    \\
+Max(E\_exc) displayed (Mev)   &10   \\
+                              &     \\
+\hline
+\end{tabular}
+\end{center}
+
+%
+%= subsection: quantum numbers =========================================
+%
+\subsection{Section about the quantum numbers}
+
+\subsubsection*{Description}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+Line & Format & Data \\
+\hline
+ \textbf{10}   & 1a           & \tt input\_names(10)              \\
+ \textbf{11}   & 1a           & \tt input\_names(11)              \\
+ \textbf{12}   & 1a30, 1i3    & \tt input\_names(12), hwg\_Z      \\
+ \textbf{13}   & 1a30, 1i3    & \tt input\_names(13), hwg\_N      \\
+ \textbf{14}   & 1a30, 1i3    & \tt input\_names(14), hwg\_Zc     \\
+ \textbf{15}   & 1a30, 1i3    & \tt input\_names(15), hwg\_Nc     \\
+ \textbf{16}   & 1a30, 1i3    & \tt input\_names(16), hwg\_2jmax  \\
+ \textbf{17}   & 1a30, 1i3    & \tt input\_names(17), hwg\_2jmin  \\
+ \textbf{18}   & 1a30, 1i3    & \tt input\_names(18), hwg\_pmin   \\
+ \textbf{19}   & 1a30, 1i3    & \tt input\_names(19), hwg\_pmax   \\
+ \textbf{20}   & 1a30, 1f5.2  & \tt input\_names(20), hwg\_echp   \\
+ \textbf{21}   & 1a30, 1f5.2  & \tt input\_names(21), hwg\_echn   \\
+ \textbf{22}   & 1a           & \tt input\_names(22)              \\
+\hline
+\end{tabular}
+\end{center}
+where
+\begin{itemize}
+ \item \ttt{hwg\_Z}: number of active protons (after particle-number projection on the ket).
+ \item \ttt{hwg\_N}: number of active neutrons (same as above). 
+ \item \ttt{hwg\_Zc}: number of core protons.
+ \item \ttt{hwg\_Nc}: number of core neutrons. 
+ \item \ttt{hwg\_2jmin}: minimum value of the angular momentum $2J$ considered.
+ \item \ttt{hwg\_2jmax}: maximum value of the angular momentum $2J$ considered.
+ \item \ttt{hwg\_pmin}: minimum value of the parity $P$ considered.
+ \item \ttt{hwg\_pmax}: maximum value of the parity $P$ considered.
+ \item \ttt{hwg\_echp}: electric charge for the protons.              
+ \item \ttt{hwg\_echn}: electric charge for the neutrons.             
+\end{itemize}
+
+\subsubsection*{Example}
+\begin{center}
+\tt
+\begin{tabular}{|ll|}
+\hline
+Quantum numbers                &      \\
+------------------------------ &      \\
+Number of active protons  Z    &20    \\
+Number of active neutrons N    &28    \\
+Number of core protons  Zc     &0     \\
+Number of core neutrons Nc     &0     \\
+Angular momentum min(2*J)      &0     \\
+Angular momentum max(2*J)      &8     \\
+Parity min(P)                  &1     \\
+Parity max(P)                  &1     \\
+Electric charge protons\phantom{ } (*e)  &1.00  \\
+Electric charge neutrons (*e)  &0.00  \\
+                               &      \\
+\hline
+\end{tabular}
+\end{center}
+
+%
+%= subsection: cutoffs =================================================
+%
+\subsection{Section about the cut-offs}
+
+\subsubsection*{Description}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+Line & Format & Data \\
+\hline
+ \textbf{23}   & 1a    & \tt input\_names(23)                          \\
+ \textbf{24}   & 1a    & \tt input\_names(24)                          \\
+ \textbf{25}   & 1a30, 1i5 & \tt input\_names(25), cutoff\_ldim        \\
+ \textbf{26}   & 1a30, 1es10.3 & \tt input\_names(26), cutoff\_over    \\
+ \textbf{27}   & 1a30, 1es10.3 & \tt input\_names(27), cutoff\_algo    \\
+ \textbf{28}   & 1a30, 1es10.3 & \tt input\_names(28), cutoff\_negev   \\
+ \textbf{29}   & 1a30, 1es10.3 & \tt input\_names(29), cutoff\_J       \\
+ \textbf{30}   & 1a30, 1es10.3 & \tt input\_names(30), cutoff\_A       \\
+ \textbf{31}   & 1a30, 1i5 & \tt input\_names(31), cutoff\_spec\_dim   \\
+               &           & \tt do i=1, cutoff\_spec\_dim           \\
+ \textbf{  }   & 1a30, 1a1,  & \:\: \tt input\_spec(i), cutoff\_spec\_type(i),   \\
+ \textbf{  }   & 2i3,        & \:\: \tt cutoff\_spec\_2j(i), cutoff\_spec\_p(i), \\
+ \textbf{  }   & 1x, 1es10.3 & \:\: \tt cutoff\_spec\_value(i) \\
+ \textbf{  }   &             & \:\: \tt (if cutoff\_spec\_type(i) $\ne$ 'L') \\
+ \textbf{  }   &  OR         & \:\: OR \\
+ \textbf{  }   & 1a30, 1a1,  & \:\: \tt input\_spec(i), cutoff\_spec\_type(i),   \\
+ \textbf{  }   & 2i3,        & \:\: \tt cutoff\_spec\_2j(i), cutoff\_spec\_p(i), \\
+ \textbf{  }   & 1i19,1i3    & \:\: \tt cutoff\_spec\_label(i), cutoff\_spec\_lab2k(i) \\
+ \textbf{  }   &             & \:\: \tt (if cutoff\_spec\_type(i) $=$ 'L') \\
+               &           & \tt enddo                               \\
+\hline
+\end{tabular}
+\end{center}
+where
+\begin{itemize}
+\item \ttt{cutoff\_ldim}: Maximum number of reference states considered in the mixing.
+\item \ttt{cutoff\_over}: Default cut-off value for the projected overlap. The projected states with an overlap $<$ \ttt{cutoff\_over} will be discarded when reading the projected matrix elements.
+\item \ttt{cutoff\_algo}: Default cut-off value for the norm eigenvalues. For \ttt{hwg\_algo = 0}, the norm eigenstates with an eigenvalue $<$ \ttt{cutoff\_algo} will be discarded when 
+      building the natural basis. For \ttt{hwg\_algo = 1}, the generalized eigenvalues ($\alpha,\beta$), with $\beta <$ \ttt{cutoff\_algo} will be discarded.
+\item \ttt{cutoff\_negev}: Default cut-off value for the negative eigenvalues. For \ttt{hwg\_rmev = 1}, the projected states giving a negative eigenvalue $<$ $-$\ttt{cutoff\_negev} 
+      will be discarded before solving the HWG equation.
+\item \ttt{cutoff\_J}: Default cut-off value for the expectation values of $J_z$ and $J^2$. The projected states with an expectation value $|\langle J_z/J^2 \rangle - K/J^2| >$ \ttt{cutoff\_J}
+      will be discarded when reading the projected matrix elements.
+\item \ttt{cutoff\_A}: Default cut-off value for the expectation values of $N$, $Z$ and $A$. The projected states with an expectation value $|\langle N/Z/A \rangle - N/Z/A| >$ \ttt{cutoff\_A}
+      will be discarded when reading the projected matrix elements.
+\item \ttt{cutoff\_spec\_dim}: Number of specific cut-offs, i.e.\ cut-offs that are specific to a given angular momentum/parity block.
+\item \ttt{cutoff\_spec\_type}: Type of specific cut-off. \\[0.05cm]
+ \ttt{= O\:} overlap cut-off. \\[0.05cm]
+ \ttt{= S\:} small norm eigenstate cut-off. \\[0.05cm]
+ \ttt{= N\:} negative eigenvalue cut-off. \\[0.05cm]
+ \ttt{= J\:} $J_z$ and $J^2$ cut-off. \\[0.05cm]
+ \ttt{= A\:} $N$, $Z$ and $A$ cut-off. \\[0.05cm]
+ \ttt{= L\:} label cut-off. 
+\item \ttt{cutoff\_spec\_2j}: 2*$J$ of the block considered.
+\item \ttt{cutoff\_spec\_p}: $P$ of the block considered.
+\item \ttt{cutoff\_spec\_value}: Value of the cut-off (if 'O', 'S', 'N', 'J' or 'A').
+\item \ttt{cutoff\_spec\_label}: Label of the state (if 'L').
+\item \ttt{cutoff\_spec\_lab2k}: 2*$K$ of the state (if 'L').
+\end{itemize}
+
+\subsubsection*{Example}
+\begin{center}
+\tt
+\begin{tabular}{|ll|}
+\hline
+Cut-offs                      &          \\
+----------------              &          \\
+Maximum number of states      &0         \\
+Cut-off projected overlap     &1.000E-06 \\
+Cut-off norm eigenvalues      &1.000E-06 \\
+Cut-off expect.~val.~Jz/J$^2$ &1.000E-02 \\
+Cut-off expect.~val.~N/Z/A    &1.000E+01 \\
+No.~of specialized cut offs   &2         \\
+Example of label cut-off      &L \phantom{0}0 \phantom{0}1 1234567891234567891 \phantom{0}0  \\
+Example of overlap cut-off    &O \phantom{0}0 \phantom{0}1 1.000E-05 \\
+\hline
+\end{tabular}
+\end{center}
+
+%
+%= Section: other inputs ===============================================
+% 
+\section{Other input files}
+
+The code \TAURUSmix~ takes in entry several binary input files produced by \TAURUSpav: 
+\begin{itemize}
+  \item \ttt{projmatelem\_states.bin:} contains the information about the projected states (e.g. expectation values for the Hamiltonian, quantum numbers and radii).
+  \item \ttt{projmatelem\_Ql.bin (Ql=E1,E2,E3,M1,M2):} contains the informations about the electromagnetic transitions. These files are not necessary and the code will 
+        skip the calculations of a given multipole if its associated file is missing. 
+\end{itemize}
+To gather all the files coming from different runs of \TAURUSpav, we recommend using the ``cat'' command. For example: \\
+{\tt touch projmatelem\_states.bin} \\
+{\tt cat state1\_projmatelem\_states.bin >> projmatelem\_states.bin} \\
+{\tt cat state2\_projmatelem\_states.bin >> projmatelem\_states.bin} \\
+{\tt $\ldots$} \\
+The files can be gathered in any arbitrary order.
+
+%
+%= End document ======================================================
+%
+\end{document}
+%
+%=====================================================================

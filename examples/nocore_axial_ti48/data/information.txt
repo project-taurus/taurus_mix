@@ -1,0 +1,5 @@
+The matrix elements considered here are taken from a calculation on Ti48 published in: Yao et al., Physical Review Letters 124, 232501 (2020).
+Remarks:  
+- The references states used are axial (only K=0).
+- Only the positive parity states are considered.
+- Only the energies and E2 transitions are given.
