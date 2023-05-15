@@ -127,7 +127,7 @@ If you use this code in your research work and publications, please cite us:
 > II. Configuration mixing of symmetry-projected states  
 > In preparation
 
-## Additional informations
+## Additional information 
 
 ### License
 TAURUS_mix is licensed under GNU General Public License version 3 (see LICENSE.txt).
