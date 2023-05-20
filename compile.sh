@@ -8,7 +8,7 @@
 # BLAS/LAPACK libraries. When using the intel compiler "ifort", we recommend
 # to use of their specific Math Kernel Library (MKL).
 
-# The scripts takes two arguments:
+# The script takes one argument: 
 #  FC = $1 (Fortran compiler)
 #     = "gfortran", "ifort"
 

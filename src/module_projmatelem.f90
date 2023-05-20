@@ -378,7 +378,7 @@ do
   if ( idx_r == 0 ) cycle
 
   !!! Computes the spin-orbit correction for the charge radii
-  xr2so = magmome_mup * xamsp + magmome_mun * xamsn
+  xr2so = (magmome_mup - 0.5d0) * xamsp + magmome_mun * xamsn
 
   !!! Stores the matrix elements (direct and symmetric)
   projme_over(idx_l,idx_r)  = xover
