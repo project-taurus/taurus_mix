@@ -53,8 +53,10 @@ real(r64), parameter :: pi = 4.0d0 * atan(1.0d0),  & ! 3.14159265...
                         mass_ma = (mass_mp + mass_mn)/2, & ! nucleon mass
                         magmome_mup = +2.79284734d0, & ! magnetic moment proton
                         magmome_mun = -1.91304273d0, & !    "       "    neutron
-                        gyro_gl(2) = [1.0d0, 0.0d0],  & ! gyromagnetic factor l
-                        gyro_gs(2) = [5.58569469d0, -3.82608545d0] !"    "    s
+                        gyro_glp = 1.0d0, & ! gyromagnetic factor L proton 
+                        gyro_gln = 0.0d0, & !        "       "    " neutron 
+                        gyro_gsp = +5.58569469d0, & !"       "    S proton  
+                        gyro_gsn = -3.82608545d0    !"       "    " neutron 
 
 END MODULE Constants
 !==============================================================================!
