@@ -663,6 +663,7 @@ integer :: i, k, n2j, n2mj, n2kj, np, idx_l, idx_r, pdim, iexit, ialloc=0
 integer(i64) :: label_l, label_r
 integer, dimension(1) :: loclab
 real(r64), dimension(:,:), allocatable  :: xoccn
+real(r64) :: factor
 
 !!! Initialization
 projme_occn = zero
@@ -715,10 +716,16 @@ do
     enddo
   
     if ( idx_r == 0 ) cycle
-  
+ 
     !!! Stores the matrix elements (direct and symmetric)
-    projme_occn(idx_l,idx_r,:,:)  = xoccn(:,:)
-    projme_occn(idx_r,idx_l,:,:)  = xoccn(:,:)
+    if ( hwg_norm == 1 ) then 
+      factor = projme_norm(idx_l,block_p,0) * projme_norm(idx_r,block_p,0)
+    else
+      factor = one
+    endif
+  
+    projme_occn(idx_l,idx_r,:,:) = factor * xoccn(:,:)
+    projme_occn(idx_r,idx_l,:,:) = factor * xoccn(:,:)
   enddo
 enddo
 
