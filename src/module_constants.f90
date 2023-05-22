@@ -17,14 +17,15 @@ integer, parameter :: uti = input_unit,  &
                       utlw = uti + uto +  1, & ! left_weights.bin
                       utrw = uti + uto +  2, & ! right_weights.bin
                       utst = uti + uto +  3, & ! projmatelm_states.bin
-                      ute1 = uti + uto +  4, & ! projmatelm_E1.bin        
-                      ute2 = uti + uto +  5, & ! projmatelm_E2.bin         
-                      ute3 = uti + uto +  6, & ! projmatelm_E3.bin          
-                      utm1 = uti + uto +  7, & ! projmatelm_M1.bin         
-                      utm2 = uti + uto +  8, & ! projmatelm_M2.bin        
-                      ut0n = uti + uto +  9, & ! 0nu2beta.me   
-                      utd1 = uti + uto + 15, & ! generic data file
-                      utd2 = uti + uto + 16    ! generic data file
+                      utoc = uti + uto +  4, & ! projmatelm_occnumb.bin
+                      ute1 = uti + uto +  5, & ! projmatelm_E1.bin        
+                      ute2 = uti + uto +  6, & ! projmatelm_E2.bin         
+                      ute3 = uti + uto +  7, & ! projmatelm_E3.bin          
+                      utm1 = uti + uto +  8, & ! projmatelm_M1.bin         
+                      utm2 = uti + uto +  9, & ! projmatelm_M2.bin        
+                      ut0n = uti + uto + 15, & ! 0nu2beta.me   
+                      utd1 = uti + uto + 16, & ! generic data file
+                      utd2 = uti + uto + 17    ! generic data file
 
 !!! Definition of kind parameters (for portability)
 integer, parameter :: i8  = int8,   & ! integer  8 bits

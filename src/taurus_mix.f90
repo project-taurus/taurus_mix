@@ -53,6 +53,7 @@ do block_2j = hwg_2jmin, hwg_2jmax, 2
       if ( hwg_norm == 1 ) call normalize_projmatelem_states(block_p)
       if ( hwg_rmev == 1 ) call remove_negev_projmatelem_states(block_2j, &
                                                                 block_p)
+      if ( do_occn ) call read_projmatelem_occnumb(block_2j,block_p)
       if ( do_Tl ) call read_projmatelem_transitions_elm(block_2j,block_p)
   
       if ( hwg_algo == 0 ) then 

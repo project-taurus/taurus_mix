@@ -274,6 +274,8 @@ Example of overlap cut-off    &O \phantom{0}0 \phantom{0}1 1.000E-05 \\
 The code \TAURUSmix~ takes in entry several binary input files produced by \TAURUSpav: 
 \begin{itemize}
   \item \ttt{projmatelem\_states.bin:} contains the information about the projected states (e.g. expectation values for the Hamiltonian, quantum numbers and radii).
+  \item \ttt{projmatelem\_occnumb.bin:} contains the information about the occupation numbers (and the basis). These files are not necessary and the code will 
+        skip the calculations of the occupation numbers if its associated file is missing. 
   \item \ttt{projmatelem\_Ql.bin (Ql=E1,E2,E3,M1,M2):} contains the informations about the electromagnetic transitions. These files are not necessary and the code will 
         skip the calculations of a given multipole if its associated file is missing. 
 \end{itemize}

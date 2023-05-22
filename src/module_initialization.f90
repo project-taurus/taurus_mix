@@ -509,7 +509,7 @@ iwarn  = 0
 if ( hwg_phys == 0 ) then 
  
   !!! States    
-  inquire (file="projmatelem_states.bin", exist=is_exist)
+  inquire(file="projmatelem_states.bin", exist=is_exist)
  
   if ( is_exist ) then
     open(utst, file="projmatelem_states.bin", status='old', action='read', &
@@ -520,9 +520,23 @@ if ( hwg_phys == 0 ) then
           &can not be found."
   endif 
  
+  !!! Occupation numbers
+  inquire(file="projmatelem_occnumb.bin", exist=is_exist)
+ 
+  if ( is_exist ) then
+    do_occn = .true.
+ 
+    open(utoc, file="projmatelem_occnumb.bin", status='old', action='read', &
+         form='unformatted')
+  else
+    iwarn = iwarn + 1
+    print "(a)","The file with the occupation numbers (projmatelem_occnumb.bin)&
+          & can not be found."
+  endif 
+ 
   !!! B(E1)                                
   if ( hwg_pmin /= hwg_pmax ) then
-    inquire (file="projmatelem_E1.bin", exist=is_exist)
+    inquire(file="projmatelem_E1.bin", exist=is_exist)
     
     if ( is_exist ) then
       do_E1 = .true.
@@ -536,7 +550,7 @@ if ( hwg_phys == 0 ) then
   endif 
   
   !!! B(E2)                                
-  inquire (file="projmatelem_E2.bin", exist=is_exist)
+  inquire(file="projmatelem_E2.bin", exist=is_exist)
 
   if ( is_exist ) then
     do_E2 = .true.
@@ -550,7 +564,7 @@ if ( hwg_phys == 0 ) then
   
   !!! B(E3)                                
   if ( hwg_pmin /= hwg_pmax ) then
-    inquire (file="projmatelem_E3.bin", exist=is_exist)
+    inquire(file="projmatelem_E3.bin", exist=is_exist)
     
     if ( is_exist ) then
       do_E3 = .true.
@@ -564,7 +578,7 @@ if ( hwg_phys == 0 ) then
   endif 
   
   !!! B(M1)                                
-  inquire (file="projmatelem_M1.bin", exist=is_exist)
+  inquire(file="projmatelem_M1.bin", exist=is_exist)
 
   if ( is_exist ) then
     do_M1 = .true.
@@ -578,7 +592,7 @@ if ( hwg_phys == 0 ) then
   
   !!! B(M2)                                
   if ( hwg_pmin /= hwg_pmax ) then
-    inquire (file="projmatelem_M2.bin", exist=is_exist)
+    inquire(file="projmatelem_M2.bin", exist=is_exist)
     
     if ( is_exist ) then
       do_M2 = .true.

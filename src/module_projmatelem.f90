@@ -11,6 +11,7 @@
 ! - subroutine print_projmatelem_states                                        !
 ! - subroutine normalize_projmatelem_states                                    !
 ! - subroutine remove_negev_projmatelem_states                                 !
+! - subroutine read_projmatelem_occnumb                                        !
 ! - subroutine read_projmatelem_transitions_elm                                !
 !==============================================================================!
 MODULE ProjMatElem       
@@ -55,6 +56,8 @@ real(r64), dimension(:,:,:), allocatable :: projme_E1, &  ! E1 transition ELM
                                             projme_r2p, & ! radius protons
                                             projme_r2n    !   "    neutrons
 
+real(r64), dimension(:,:,:,:), allocatable :: projme_occn ! occupation numbers 
+
 real(r64), dimension(:,:,:), allocatable :: projme_norm ! normalization
 
 !!! Local arrays 
@@ -85,7 +88,7 @@ projme_bdim = 0
 projme_ldim = 0
 projme_tdim = 0
 
-!!! Reading 
+!!! Reading the states
 do 
   read(utst,iostat=iexit) label_l, label_r
   if ( iexit /= 0 ) exit
@@ -111,10 +114,20 @@ enddo
 
 rewind(utst)
 
+!!! Reading the occupation numbers to get the information about the basis
+if ( do_occn ) then 
+  read(utoc) i, HOsh_dim
+  rewind(utoc)
+
+  allocate( HOsh_na(HOsh_dim,2), stat=ialloc )
+  if ( ialloc /= 0 ) stop 'Error during allocation when reading shells.'
+
+  read(utoc) i, HOsh_dim, HOsh_na
+  rewind(utoc)
+endif
+
 !!! Computes the total number of states possibles given the symmetries
 projme_tdim = projme_ldim(0,0,1) * (hwg_2jmax + 1)
-
-
 
 !!! Allocations: arrays to identify the states
 allocate( projme_label_read(projme_ldim(0,0,1)),              &
@@ -140,6 +153,7 @@ allocate( projme_over(projme_tdim,projme_tdim), &
           projme_read(projme_tdim,projme_tdim), &
           projme_r2p(projme_tdim,projme_tdim,0:0), &
           projme_r2n(projme_tdim,projme_tdim,0:0), &
+          projme_occn(projme_tdim,projme_tdim,HOsh_dim,2), &
           transition(projme_tdim,projme_tdim,-3:0), &
           warnings_zero(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
           stat=ialloc )
@@ -182,6 +196,16 @@ endif
 
 if ( ialloctot /= 0 ) stop 'Error during allocation of arrays for projected &
                             &matrix elements'
+
+!read(utoc) pdim, HOsh_dim
+
+!allocate( HOsh_na(HOsh_dim,2), & 
+!         projme_occn(projme_tdim,projme_tdim,HOsh_dim,2), &
+!         stat=ialloc )
+!if ( ialloc /= 0 ) stop 'Error during allocation when reading occ. numb.'
+
+!read(utoc) HOsh_na  
+!rewind(utoc)
 
 end subroutine read_projmatelem_initial
 
@@ -616,6 +640,89 @@ endif
 deallocate( list_rm, list_zdim, overlap, eigen_norm, work )
 
 end subroutine remove_negev_projmatelem_states    
+
+!------------------------------------------------------------------------------!
+! subroutine read_projmatelem_occnumb                                          !
+!                                                                              !
+! Reads the file containing the occupation numbers.                            !
+!                                                                              !
+! Remark: using pdim, we could parse much more rapidly the file, as we know    !
+! how many blocks to jump to go to the next label!                             !
+!                                                                              !
+! Input: block_2j = value of 2*j for this symmetry block                       !
+!        block_p  =   "   "   p   "    "     "       "                         !
+!------------------------------------------------------------------------------!
+subroutine read_projmatelem_occnumb(block_2j,block_p)
+
+integer, intent(in) :: block_2j, block_p
+integer :: i, k, n2j, n2mj, n2kj, np, idx_l, idx_r, pdim, itmp, iexit, ialloc=0
+integer(i64) :: label_l, label_r
+integer, dimension(1) :: loclab
+real(r64), dimension(:,:), allocatable  :: xoccn
+
+!!! Initialization
+projme_occn = zero
+
+allocate( xoccn(HOsh_dim,2), source=zero, stat=ialloc )
+if ( ialloc /= 0 ) stop 'Error during allocation when reading occ. numb.'
+
+!!! Reading            
+do 
+  read(utoc, iostat=iexit) pdim, itmp, (itmp, i=1,2*HOsh_dim,1)
+  if ( iexit /= 0 ) exit
+                          
+  do k = 1, pdim
+    read(utoc, iostat=iexit) label_l, label_r, n2j, n2mj, n2kj, np, &
+                             xoccn
+
+    !!! Only considers reference states previously recorded   
+    loclab = findloc(projme_label_read,label_l)
+    if ( loclab(1) == 0 ) cycle 
+  
+    loclab = findloc(projme_label_read,label_r)
+    if ( loclab(1) == 0 ) cycle 
+   
+    !!! Only considers the states with good quantum numbers
+    if ( n2j /= block_2j ) cycle
+    if ( np  /= block_p  ) cycle
+   
+    !!! Determines the presence/index of the left state 
+    idx_l = 0 
+    do i = 1, projme_bdim(0,block_p,1)
+      if ( label_l == projme_label(i,0,block_p,1) ) then
+        if ( n2mj == projme_2kj(i,0,block_p,1) ) then
+          idx_l = i
+          exit
+        endif
+      endif
+    enddo
+  
+    if ( idx_l == 0 ) cycle
+  
+    !!! Determines the presence/index of the right state
+    idx_r = 0 
+    do i = 1, projme_bdim(0,block_p,1)
+      if ( label_r == projme_label(i,0,block_p,1) ) then
+        if ( n2kj == projme_2kj(i,0,block_p,1) ) then
+          idx_r = i
+          exit
+        endif
+      endif
+    enddo
+  
+    if ( idx_r == 0 ) cycle
+  
+    !!! Stores the matrix elements (direct and symmetric)
+    projme_occn(idx_l,idx_r,:,:)  = xoccn(:,:)
+    projme_occn(idx_r,idx_l,:,:)  = xoccn(:,:)
+  enddo
+enddo
+
+deallocate( xoccn )
+
+rewind(utoc)
+
+end subroutine read_projmatelem_occnumb   
 
 !------------------------------------------------------------------------------!
 ! subroutine read_projmatelem_transitions_elm                                  !

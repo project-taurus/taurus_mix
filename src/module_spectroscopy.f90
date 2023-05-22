@@ -993,24 +993,24 @@ print '(/,60("%"),/,20x,"COMPLEMENTARY FILES",21x,/,60("%"),//, &
        &7x,"Description",22x,"File",/,62("-"))'
 
 !!! Weights
-inquire (file="weights_f.txt", exist=is_exist)
+inquire(file="weights_f.txt", exist=is_exist)
 if ( is_exist ) print '(a)',"Weights f (solution HWG) : weights_f.txt"
 
 !!! Spectrum
-inquire (file="spectrum_sorted_energy.txt", exist=is_exist)
+inquire(file="spectrum_sorted_energy.txt", exist=is_exist)
 if ( is_exist ) print '(a)', "Spectrum (sorted E)      : & 
                              &spectrum_sorted_energy.txt"
 
-inquire (file="spectrum_sorted_spinparity.txt", exist=is_exist)
+inquire(file="spectrum_sorted_spinparity.txt", exist=is_exist)
 if ( is_exist ) print '(a)',"Spectrum (sorted J^pi)   : & 
                        &spectrum_sorted_spinparity.txt"
 
 !!! Transitions
-inquire (file="transitions_sorted_energy.txt", exist=is_exist)
+inquire(file="transitions_sorted_energy.txt", exist=is_exist)
 if ( is_exist ) print '(a)',"Transitions (sorted E)   : &
                        &transitions_sorted_energy.txt"
 
-inquire (file="transitions_sorted_spinparity.txt", exist=is_exist)
+inquire(file="transitions_sorted_spinparity.txt", exist=is_exist)
 if ( is_exist ) print '(a)',"Transitions (sorted J^pi): & 
                        &transitions_sorted_spinparity.txt"
 
@@ -1028,7 +1028,7 @@ do n2j = hwg_2jmin, k, 2
 
     namefile = "convergence_norm_eigenvalues_" // trim(adjustl(chJ)) // &
                trim(chP) // ".txt"
-    inquire (file=namefile, exist=is_exist)
+    inquire(file=namefile, exist=is_exist)
     if ( is_exist ) print '(a,a)',"Convergence (# norm ev)  : ", &
                                    adjustl(namefile)
   enddo
@@ -1042,7 +1042,7 @@ do n2j = hwg_2jmin, hwg_2jmax, 2
 
     namefile = "collective_wavefunction_" // trim(adjustl(chJ)) // &
                trim(chP) // ".txt"
-    inquire (file=namefile, exist=is_exist)
+    inquire(file=namefile, exist=is_exist)
     if ( is_exist ) print '(a,a)',"Collective wave function : ", & 
                                   adjustl(namefile)
   enddo
