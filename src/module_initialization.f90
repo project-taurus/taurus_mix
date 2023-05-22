@@ -378,12 +378,14 @@ if ( (-1)**hwg_2jmin /= (-1)**hwg_2jmax ) then
         &= ",(-1)**hwg_2jmax,"."
 endif 
 
-if ( (-1)**(hwg_N+hwg_Z) /= (-1)**hwg_2jmin ) then
-  ierror = ierror + 1
-  print "(a,1i2,a,1i2,a)","The number parity (-1**(hwg_N+hwg_Z)) = ", &
-        (-1)**(hwg_N+hwg_Z)," should be equal to the number parity &
-        &(-1**hwg_2jmin) = ",(-1)**hwg_2jmin,"."
-endif 
+! Deactivated: when no projection, everything is written as J=0, even for
+! odd-A nuclei. This test stops the code.
+!if ( (-1)**(hwg_N+hwg_Z) /= (-1)**hwg_2jmin ) then
+!  ierror = ierror + 1
+!  print "(a,1i2,a,1i2,a)","The number parity (-1**(hwg_N+hwg_Z)) = ", &
+!        (-1)**(hwg_N+hwg_Z)," should be equal to the number parity &
+!        &(-1**hwg_2jmin) = ",(-1)**hwg_2jmin,"."
+!endif 
 
 if ( (hwg_pmin /= -1) .and. (hwg_pmin /= 1) ) then
   ierror = ierror + 1

@@ -62,6 +62,8 @@ do block_2j = hwg_2jmin, hwg_2jmax, 2
         call solve_hwg_qz(block_2j,block_p,projme_bdim(0,block_p,1))
       endif
    
+      if ( do_occn ) call calculate_occnumb_spectrum(block_2j,block_p, &
+                                                     projme_tdim)
       call calculate_transitions_elm(block_2j,block_p,projme_tdim)
     else
       print '(/,"No projected states have been found or selected.")'

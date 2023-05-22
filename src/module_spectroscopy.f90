@@ -40,7 +40,8 @@ real(r64), dimension(:,:,:), allocatable :: states_ener, & ! energy
                                             states_nucl, & ! nucleon   "
                                             states_amj2, & ! ang. mom. J^2
                                             states_ist2, & ! isospin T^2
-                                            states_r2so    ! spin-orbit correc.
+                                            states_r2so, & ! spin-orbit correc.
+                                            states_occn    ! occupation numbers
 
 !!! Reduced matrix elements for electromagnetic transitions
 real(r64), dimension(:,:,:,:,:), allocatable :: transi_E1, & ! E1 transition ELM
@@ -80,6 +81,7 @@ allocate ( states_ener(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            states_amj2(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            states_ist2(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            states_r2so(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
+           states_occn(ndim,HOsh_dim,2), &
            warnings_norm(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            warnings_cplx(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            weights_f(ndim,ndim,-3:0,hwg_pmin:hwg_pmax,1), &
@@ -94,6 +96,7 @@ states_nucl = zero
 states_amj2 = zero
 states_ist2 = zero
 states_r2so = zero
+states_occn = zero
 warnings_norm = 0
 warnings_cplx = 0
 weights_f = zero
@@ -767,6 +770,61 @@ call multiply_weights_diag(F,projme_r2so(1:ndim,1:ndim), &
 end subroutine calculate_properties_spectrum
 
 !------------------------------------------------------------------------------!
+! subroutine calculate_occnumb_spectrum                                        !
+!                                                                              !
+! Computes the occupation numbers of the final eigenstates of H.               !
+!                                                                              !
+! Input: ndim = dimension of the matrices (max. number of states)              !
+!        block_2j = value of 2*j for this symmetry block                       !
+!        block_p  =   "   "   p   "   "      "       "                         !
+!------------------------------------------------------------------------------!
+subroutine calculate_occnumb_spectrum(block_2j,block_p,ndim)  
+
+integer, intent(in) :: ndim, block_2j, block_p
+integer :: i, k
+real(r64), dimension(ndim,ndim) :: F
+character(1) :: chP
+character(5) :: chJ
+character(50) :: namefile
+character(len=*), parameter :: format1 = "(5i6,1i9,2f13.6)", &
+                               format2 = "(9x,1a3,27x,2f13.6)"
+
+!!! Opens the data files to write the information
+chP = adjustr(char_P(block_p))
+chJ = adjustr(char_J(block_2j))
+
+namefile = "occupation_numbers_" // trim(adjustl(chJ)) // &
+           trim(chP) // ".txt"
+open(utd2, file=namefile, status='replace', action='write', form='formatted')
+
+write(utd2,'(5x,"i",5x,"#",5x,"n",5x,"l",3x,"2*j",4x,"label",5x,"protons",6x, &
+           &"neutrons",/,65("-"))')
+
+!!! Computes the occupation numbers using the weights of the current states
+F(:,:) = weights_f(:,:,0,block_p,1)
+
+do i = 1, 2
+  do k = 1, HOsh_dim
+    call multiply_weights_diag(F,projme_occn(1:ndim,1:ndim,k,i), &
+                               states_occn(1:ndim,k,i),ndim)
+  enddo
+enddo
+
+!!! Writes the results in a file
+do i = 1, ndim
+  if ( i > 1 ) write(utd2,'(/)')
+  do k = 1, HOsh_dim
+    write(utd2,format1) i, k, HOsh_n(k), HOsh_l(k), HOsh_2j(k), & 
+                        HOsh_na(k), states_occn(i,k,1), states_occn(i,k,2)
+  enddo
+  write(utd2,format2) "sum", sum(states_occn(i,:,1)), sum(states_occn(i,:,2))
+enddo
+
+close(utd2, status='keep')                                                       
+
+end subroutine calculate_occnumb_spectrum
+
+!------------------------------------------------------------------------------!
 ! subroutine calculate_transitions_elm                                         !
 !                                                                              !
 ! Computes transition matrix elements for the various operators between the    !
@@ -1044,6 +1102,20 @@ do n2j = hwg_2jmin, hwg_2jmax, 2
                trim(chP) // ".txt"
     inquire(file=namefile, exist=is_exist)
     if ( is_exist ) print '(a,a)',"Collective wave function : ", & 
+                                  adjustl(namefile)
+  enddo
+enddo
+
+!!! Occupation numbers
+do n2j = hwg_2jmin, hwg_2jmax, 2
+  do np = hwg_pmax, hwg_pmin, -2
+    chP = adjustr(char_P(np))
+    chJ = adjustr(char_J(n2j))
+
+    namefile = "occupation_numbers_" // trim(adjustl(chJ)) // &
+               trim(chP) // ".txt"
+    inquire(file=namefile, exist=is_exist)
+    if ( is_exist ) print '(a,a)',"Occupation numbers       : ", & 
                                   adjustl(namefile)
   enddo
 enddo

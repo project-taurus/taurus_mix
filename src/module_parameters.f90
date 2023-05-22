@@ -38,8 +38,11 @@ real(r64) :: hwg_echp, & ! Electric charge for protons
              hwg_echn    !    "        "    "  neutrons   
 
 !!! Basis information
-integer :: HOsh_dim ! Number of shells (for 1 particle species)
-integer, dimension(:,:), allocatable :: HOsh_na ! Name of the shells 
+integer :: HOsh_dim ! dimension of the basis
+integer, dimension(:), allocatable :: HOsh_n,  & ! quantum number  n
+                                      HOsh_l,  & !     "      "    l
+                                      HOsh_2j, & !     "      "   2j
+                                      HOsh_na    ! label of the shell
 
 !!! Quantum numbers written as nice characters
 character(3) :: char_Jleg, char_Kleg 

@@ -78,7 +78,7 @@ CONTAINS
 !------------------------------------------------------------------------------!
 subroutine read_projmatelem_initial
 
-integer :: i, iexit, ialloc=0, ialloctot=0
+integer :: i, htype, facn, iexit, ialloc=0, ialloctot=0
 integer(i64) :: label_l, label_r 
 integer(i64), dimension(10000) :: label_read=0
 logical :: is_new
@@ -116,14 +116,28 @@ rewind(utst)
 
 !!! Reading the occupation numbers to get the information about the basis
 if ( do_occn ) then 
-  read(utoc) i, HOsh_dim
+  read(utoc) i, htype, HOsh_dim
   rewind(utoc)
 
-  allocate( HOsh_na(HOsh_dim,2), stat=ialloc )
-  if ( ialloc /= 0 ) stop 'Error during allocation when reading shells.'
+  allocate( HOsh_n(HOsh_dim), HOsh_l(HOsh_dim), HOsh_2j(HOsh_dim), &
+            HOsh_na(HOsh_dim), stat=ialloc )
+  if ( ialloc /= 0 ) stop 'Error during allocation of shells'
 
-  read(utoc) i, HOsh_dim, HOsh_na
+  read(utoc) i, htype, HOsh_dim, HOsh_na
   rewind(utoc)
+
+  !!! Determines the quantum numbers of the shells
+  if ( (htype == 1) .or. (htype == 2) ) then
+    facn = 1000
+  else
+    facn = 10000
+  endif
+
+  do i = 1, HOsh_dim
+    HOsh_n(i)  =  HOsh_na(i) / facn 
+    HOsh_l(i)  = (HOsh_na(i) - HOsh_n(i)*facn) / 100
+    HOsh_2j(i) =  HOsh_na(i) - HOsh_n(i)*facn - HOsh_l(i)*100
+  enddo
 endif
 
 !!! Computes the total number of states possibles given the symmetries
@@ -196,16 +210,6 @@ endif
 
 if ( ialloctot /= 0 ) stop 'Error during allocation of arrays for projected &
                             &matrix elements'
-
-!read(utoc) pdim, HOsh_dim
-
-!allocate( HOsh_na(HOsh_dim,2), & 
-!         projme_occn(projme_tdim,projme_tdim,HOsh_dim,2), &
-!         stat=ialloc )
-!if ( ialloc /= 0 ) stop 'Error during allocation when reading occ. numb.'
-
-!read(utoc) HOsh_na  
-!rewind(utoc)
 
 end subroutine read_projmatelem_initial
 
@@ -655,7 +659,7 @@ end subroutine remove_negev_projmatelem_states
 subroutine read_projmatelem_occnumb(block_2j,block_p)
 
 integer, intent(in) :: block_2j, block_p
-integer :: i, k, n2j, n2mj, n2kj, np, idx_l, idx_r, pdim, itmp, iexit, ialloc=0
+integer :: i, k, n2j, n2mj, n2kj, np, idx_l, idx_r, pdim, iexit, ialloc=0
 integer(i64) :: label_l, label_r
 integer, dimension(1) :: loclab
 real(r64), dimension(:,:), allocatable  :: xoccn
@@ -668,7 +672,7 @@ if ( ialloc /= 0 ) stop 'Error during allocation when reading occ. numb.'
 
 !!! Reading            
 do 
-  read(utoc, iostat=iexit) pdim, itmp, (itmp, i=1,2*HOsh_dim,1)
+  read(utoc, iostat=iexit) pdim
   if ( iexit /= 0 ) exit
                           
   do k = 1, pdim
