@@ -38,7 +38,7 @@ subroutine print_version
 print '(" __________________________________________________________",/, &
       & "|                                                          |",/, &
       & "|  (______)                                                |",/, &
-      & "|  <(0  0)>   TAURUS_mix, version 2023.05.22               |",/, &
+      & "|  <(0  0)>   TAURUS_mix, version 2023.05.28               |",/, &
       & "|    (°°)                                                  |",/, &
       & "|                                                          |",/, &
       & "| This code performs the configuration mixing of symmetry  |",/, &

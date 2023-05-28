@@ -5,8 +5,6 @@
 ! spectrum obtained after solving the HWG equations, i.e. PGCM states and      !
 ! gamma spectroscopy.                                                          !
 !                                                                              !
-! Remark: the electromagnetic transitions could be put in a separate submodule.!
-!                                                                              !
 ! List of routines and functions:                                              !
 ! - subroutine set_spectroscopy                                                !
 ! - subroutine read_weights_initial                                            !
@@ -14,6 +12,7 @@
 ! - subroutine solve_hwg_sqrt                                                  !
 ! - subroutine solve_hwg_qz                                                    !
 ! - subroutine calculate_properties_spectrum                                   !
+! - subroutine calculate_occnumb_spectrum                                      !
 ! - subroutine calculate_transitions_elm                                       !
 ! - subroutine store_solution                                                  !
 ! - subroutine print_warnings                                                  !
@@ -50,7 +49,8 @@ real(r64), dimension(:,:,:,:,:), allocatable :: transi_E1, & ! E1 transition ELM
                                                 transi_M1, & ! M1      "      "
                                                 transi_M2, & ! M2      "      "
                                                 transi_r2p, & ! radius protons
-                                                transi_r2n    !   "    neutrons
+                                                transi_r2n, & !   "    neutrons
+                                                transi_r2m    !   "    matter  
 
 !!! Various informations
 integer :: states_odim
@@ -104,10 +104,12 @@ weights_f = zero
 !!! Sets the electromanetic transitions
 allocate ( transi_r2p(ndim,ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax,-0:0), &
            transi_r2n(ndim,ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax,-0:0), &
+           transi_r2m(ndim,ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax,-0:0), &
            stat=ialloc )
 ialloctot = ialloctot + ialloc
 transi_r2p = zero
 transi_r2n = zero
+transi_r2m = zero
   
 if ( do_E1 ) then
   allocate ( transi_E1(ndim,ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax,-1:0), &
@@ -875,6 +877,8 @@ do dj = djmin, 0, 2
                                      transi_r2p(:,:,ji,pi,dj/2),ndim)
           call multiply_weights_full(Ff,projme_r2n(:,:,dj/2),Fi, &
                                      transi_r2n(:,:,ji,pi,dj/2),ndim)
+          call multiply_weights_full(Ff,projme_r2m(:,:,dj/2),Fi, &
+                                     transi_r2m(:,:,ji,pi,dj/2),ndim)
         !!! E1
         case (1)
           if ( .not. do_E1 ) cycle
@@ -1134,12 +1138,12 @@ subroutine print_spectrum
 integer :: i, ni, nj, np, n1, n2, n3, ialloc=0
 integer, dimension(3) :: ntab
 real(r64) :: xener, xexci, xener_gs, xpari, xprot, xneut, xnucl, xamj2, xist2, &
-             xj, xt, xqs, xmu, xr2p, xr2n, xr2so, xr2ch, cg
+             xj, xt, xqs, xmu, xr2p, xr2n, xr2m, xr2so, xr2ch, cg
 real(r64), dimension(:,:,:), allocatable :: xener_tab
 character(1) :: chP
 character(5) :: chJ
-character(len=*), parameter :: format1 = '(1a5,2x,1a1,1i4,1f11.3,6f9.3,4f12.6, &
-                                          &2f10.5)'
+character(len=*), parameter :: format1 = '(1a5,2x,1a1,1i4,1f11.3,3f9.3,4f9.4, &
+                                           &4f12.6,2f10.5)'
 
 print '(/,60("%"),/,23x,"ENERGY SPECTRUM",/,60("%"))'
 
@@ -1187,12 +1191,12 @@ xener_gs = minval(states_ener)
 !!!
 print '(/,"Displayed up to E_exc = ",1i3," MeV",/,31("="),//, &
        &2x,1a3,2x,"P",3x,"n",4x,"Energy",5x,"E_exc",5x,"Qs",7x,"mu", & 
-       &7x,"r_p",6x,"r_n ",5x,"r_ch",7x,"P",11x,"Z",11x,"N",11x,"A",10x,"J", &
-       &9x,"T",/,145("-"))', hwg_Edis, char_Jleg
+       &7x,"r_p",6x,"r_n",6x,"r_m",5x,"r_ch",8x,"P",11x,"Z",11x,"N",11x, & 
+       &"A",10x,"J",9x,"T",/,154("-"))', hwg_Edis, char_Jleg
 
 write(utd1,'(2x,1a3,2x,"P",3x,"n",4x,"Energy",5x,"E_exc",5x,"Qs",7x,"mu", & 
-         &7x,"r_p",6x,"r_n ",5x,"r_ch",7x,"P",11x,"Z",11x,"N",11x,"A",10x,"J", &
-         &9x,"T",/,145("-"))') char_Jleg
+         &7x,"r_p",6x,"r_n",6x,"r_m",5x,"r_ch",8x,"P",11x,"Z",11x,"N",11x, & 
+         &"A",10x,"J",9x,"T",/,154("-"))') char_Jleg
 
 do i = 1, states_odim
   ni = states_tabijp(i,1)
@@ -1232,9 +1236,10 @@ do i = 1, states_odim
 
   !!! Charge radii (correction taken from Cipollone.2015.PhysRevC.92.014306 and
   !!! Reinhard.2021.PhysRevC.103.054310)
-  xr2p  = sqrt( transi_r2p(ni,ni,nj,np,0) / hwg_Z ) 
-  xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) / hwg_N ) 
-  xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) / hwg_Z &
+  xr2p  = sqrt( transi_r2p(ni,ni,nj,np,0) ) 
+  xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) ) 
+  xr2m  = sqrt( transi_r2m(ni,ni,nj,np,0) ) 
+  xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
           + radius_rp2 + (hwg_N / hwg_Z) * radius_rn2 &
           + 0.75d0 * (hbarc / mass_ma)**2 &
           + (1 / hwg_Z) * ((hbarc / mass_ma)**2) * xr2so )
@@ -1245,18 +1250,18 @@ do i = 1, states_odim
   !!! Printing
   if ( xexci <= one*hwg_Edis ) then 
     write(uto,format1) chJ, chP, ni, xener, xexci, xqs, xmu, xr2p, xr2n, &
-                       xr2ch, xpari, xprot, xneut, xnucl, xj, xt
+                       xr2m, xr2ch, xpari, xprot, xneut, xnucl, xj, xt
   endif 
   write(utd1,format1) chJ, chP, ni, xener, xexci, xqs, xmu, xr2p, xr2n, & 
-                      xr2ch, xpari, xprot, xneut, xnucl, xj, xt
+                      xr2m, xr2ch, xpari, xprot, xneut, xnucl, xj, xt
 enddo
 
 !!!
 !!! Spectrum sorted by spin-parity
 !!!
-write(utd2,'(2x,1a3,2x,"P",3x,"n",4x,"Energy",5x,"E_exc",5x,"Qs",7x,"mu", &
-         &7x,"r_p",6x,"r_n ",5x,"r_ch",7x,"P",11x,"Z",11x,"N",11x,"A",10x,"J", &
-         &9x,"T",/,145("-"))') char_Jleg
+write(utd2,'(2x,1a3,2x,"P",3x,"n",4x,"Energy",5x,"E_exc",5x,"Qs",7x,"mu",  &
+         &7x,"r_p",6x,"r_n",6x,"r_m",5x,"r_ch",8x,"P",11x,"Z",11x,"N",11x, &
+         &"A",10x,"J",9x,"T",/,154("-"))') char_Jleg
 
 do nj = hwg_2jmin, hwg_2jmax, 2 
   do np = hwg_pmax, hwg_pmin, -2
@@ -1294,9 +1299,10 @@ do nj = hwg_2jmin, hwg_2jmax, 2
       endif
 
       !!! Charge radii (correction taken from Cipollone.2015.PhysRevC.92.014306)
-      xr2p  = sqrt( transi_r2p(ni,ni,nj,np,0) / hwg_Z ) 
-      xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) / hwg_N ) 
-      xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) / hwg_Z &
+      xr2p  = sqrt( transi_r2p(ni,ni,nj,np,0) ) 
+      xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) ) 
+      xr2m  = sqrt( transi_r2m(ni,ni,nj,np,0) ) 
+      xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
               + radius_rp2 + (hwg_N / hwg_Z) * radius_rn2 &
               + 0.75d0 * (hbarc / mass_ma)**2 &
               + (1 / hwg_Z) * ((hbarc / mass_ma)**2) * xr2so )
@@ -1306,7 +1312,7 @@ do nj = hwg_2jmin, hwg_2jmax, 2
 
       !!! Printing
       write(utd2,format1) chJ, chP, ni, xener, xexci, xqs, xmu, xr2p, xr2n, & 
-                          xr2ch, xpari, xprot, xneut, xnucl, xj, xt
+                          xr2m, xr2ch, xpari, xprot, xneut, xnucl, xj, xt
     enddo
   enddo
 enddo

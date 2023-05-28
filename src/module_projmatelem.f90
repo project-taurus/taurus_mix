@@ -54,7 +54,8 @@ real(r64), dimension(:,:,:), allocatable :: projme_E1, &  ! E1 transition ELM
                                             projme_M1, &  ! M1      "      "
                                             projme_M2, &  ! M2      "      "
                                             projme_r2p, & ! radius protons
-                                            projme_r2n    !   "    neutrons
+                                            projme_r2n, & !   "    neutrons
+                                            projme_r2m    !   "    matter   
 
 real(r64), dimension(:,:,:,:), allocatable :: projme_occn ! occupation numbers 
 
@@ -167,6 +168,7 @@ allocate( projme_over(projme_tdim,projme_tdim), &
           projme_read(projme_tdim,projme_tdim), &
           projme_r2p(projme_tdim,projme_tdim,0:0), &
           projme_r2n(projme_tdim,projme_tdim,0:0), &
+          projme_r2m(projme_tdim,projme_tdim,0:0), &
           projme_occn(projme_tdim,projme_tdim,HOsh_dim,2), &
           transition(projme_tdim,projme_tdim,-3:0), &
           warnings_zero(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
@@ -231,7 +233,7 @@ integer :: i, icut, cutdisp, n2j, n2mj, n2kj, hkj, np, iexit
 integer(i64) :: label_l, label_r
 integer, dimension(1) :: loclab
 real(r64) :: xover, xener, xpari, xprot, xneut, xnucl, xamj2, xamsp, xamsn, &
-             xist2, xr2p, xr2n, xj, xt
+             xist2, xr2p, xr2n, xr2m, xj, xt
 logical :: is_new_state, is_new_label
 character(len=*), parameter :: format1 = "(1i19,1i5,1f12.8,1f12.5,4f12.6,& 
                                           &2f10.5)"
@@ -247,7 +249,7 @@ projme_2kj(:,0,block_p,1) = 0
 do
   read(utst,iostat=iexit) label_l, label_r, n2j, n2mj, n2kj, np, &
                           xover, xener, xpari, xprot, xneut, xamj2, xamsp, &
-                          xamsn, xist2, xr2p, xr2n
+                          xamsn, xist2, xr2p, xr2n, xr2m
   xnucl = xprot + xneut
   if ( iexit /= 0 ) exit
 
@@ -344,7 +346,7 @@ integer :: i, n2j, n2mj, n2kj, np, idx_l, idx_r, iexit
 integer(i64) :: label_l, label_r
 integer, dimension(1) :: loclab
 real(r64) :: xover, xener, xpari, xprot, xneut, xnucl, xamj2, xamsp, xamsn, &
-             xist2, xr2p, xr2n, xr2so
+             xist2, xr2p, xr2n, xr2m, xr2so
 
 !!! Initialization
 projme_read = 0
@@ -358,13 +360,14 @@ projme_amj2 = zero
 projme_ist2 = zero 
 projme_r2p  = zero
 projme_r2n  = zero
+projme_r2m  = zero
 projme_r2so = zero
 
 !!! Reading            
 do 
   read(utst, iostat=iexit) label_l, label_r, n2j, n2mj, n2kj, np, &
                            xover, xener, xpari, xprot, xneut, xamj2, &
-                           xamsp, xamsn, xist2, xr2p, xr2n
+                           xamsp, xamsn, xist2, xr2p, xr2n, xr2m
   xnucl = xprot + xneut
   if ( iexit /= 0 ) exit
 
@@ -419,6 +422,7 @@ do
   projme_ist2(idx_l,idx_r)  = xist2
   projme_r2p(idx_l,idx_r,0) = xr2p   
   projme_r2n(idx_l,idx_r,0) = xr2n
+  projme_r2m(idx_l,idx_r,0) = xr2m
   projme_r2so(idx_l,idx_r)  = xr2so
 
   projme_over(idx_r,idx_l)  = xover
@@ -431,6 +435,7 @@ do
   projme_ist2(idx_r,idx_l)  = xist2
   projme_r2p(idx_r,idx_l,0) = xr2p
   projme_r2n(idx_r,idx_l,0) = xr2n
+  projme_r2m(idx_r,idx_l,0) = xr2m
   projme_r2so(idx_r,idx_l)  = xr2so
 
   !!! Indicates that the matrix element has been read
@@ -538,6 +543,7 @@ do j = 1, projme_bdim(0,block_p,1)
     projme_ist2(i,j) = projme_ist2(i,j) * factor
     projme_r2p(i,j,0) = projme_r2p(i,j,0) * factor
     projme_r2n(i,j,0) = projme_r2n(i,j,0) * factor
+    projme_r2m(i,j,0) = projme_r2m(i,j,0) * factor
   enddo
 enddo
 
@@ -617,6 +623,7 @@ do j = 1, rdim
 ! projme_r2so(:,k) = zero 
 ! projme_r2p(:,k,0)= zero
 ! projme_r2n(:,k,0)= zero
+! projme_r2m(:,k,0)= zero
 
   projme_over(k,:) = zero
   projme_ener(k,:) = zero
@@ -629,6 +636,7 @@ do j = 1, rdim
 ! projme_r2so(k,:) = zero 
 ! projme_r2p(k,:,0)= zero
 ! projme_r2n(k,:,0)= zero
+! projme_r2m(k,:,0)= zero
 enddo
 
 !!! Prints the states removed
