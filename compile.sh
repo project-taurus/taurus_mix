@@ -38,7 +38,7 @@ fi
 
 if [ $FC = "ifort" ]; then
   LIB=""
-  OPT="-O3 -mkl" 
+  OPT="-O3 -qmkl" 
 elif [ $FC = "gfortran" ]; then
   LIB=" "
   LIB="-L/usr/lib -llapack -lblas"
