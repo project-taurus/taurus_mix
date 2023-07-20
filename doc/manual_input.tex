@@ -32,7 +32,7 @@
 % 
 \begin{center}
  {\LARGE \textbf{\TAURUSmix: Manual for the input files}} \\[0.20cm]
- {\large 14/05/2023}
+ {\large 20/07/2023}
 \end{center}
 
 %
@@ -201,11 +201,12 @@ Line & Format & Data \\
  \textbf{24}   & 1a    & \tt input\_names(24)                          \\
  \textbf{25}   & 1a30, 1i5 & \tt input\_names(25), cutoff\_ldim        \\
  \textbf{26}   & 1a30, 1es10.3 & \tt input\_names(26), cutoff\_over    \\
- \textbf{27}   & 1a30, 1es10.3 & \tt input\_names(27), cutoff\_algo    \\
- \textbf{28}   & 1a30, 1es10.3 & \tt input\_names(28), cutoff\_negev   \\
- \textbf{29}   & 1a30, 1es10.3 & \tt input\_names(29), cutoff\_J       \\
- \textbf{30}   & 1a30, 1es10.3 & \tt input\_names(30), cutoff\_A       \\
- \textbf{31}   & 1a30, 1i5 & \tt input\_names(31), cutoff\_spec\_dim   \\
+ \textbf{27}   & 1a30, 1es10.3 & \tt input\_names(27), cutoff\_ener    \\
+ \textbf{28}   & 1a30, 1es10.3 & \tt input\_names(28), cutoff\_J       \\
+ \textbf{29}   & 1a30, 1es10.3 & \tt input\_names(29), cutoff\_A       \\
+ \textbf{30}   & 1a30, 1es10.3 & \tt input\_names(30), cutoff\_algo    \\
+ \textbf{31}   & 1a30, 1es10.3 & \tt input\_names(31), cutoff\_negev   \\
+ \textbf{32}   & 1a30, 1i5 & \tt input\_names(32), cutoff\_spec\_dim   \\
                &           & \tt do i=1, cutoff\_spec\_dim           \\
  \textbf{  }   & 1a30, 1a1,  & \:\: \tt input\_spec(i), cutoff\_spec\_type(i),   \\
  \textbf{  }   & 2i3,        & \:\: \tt cutoff\_spec\_2j(i), cutoff\_spec\_p(i), \\
@@ -224,21 +225,23 @@ where
 \begin{itemize}
 \item \ttt{cutoff\_ldim}: Maximum number of reference states considered in the mixing.
 \item \ttt{cutoff\_over}: Default cut-off value for the projected overlap. The projected states with an overlap $<$ \ttt{cutoff\_over} will be discarded when reading the projected matrix elements.
-\item \ttt{cutoff\_algo}: Default cut-off value for the norm eigenvalues. For \ttt{hwg\_algo = 0}, the norm eigenstates with an eigenvalue $<$ \ttt{cutoff\_algo} will be discarded when 
-      building the natural basis. For \ttt{hwg\_algo = 1}, the generalized eigenvalues ($\alpha,\beta$), with $\beta <$ \ttt{cutoff\_algo} will be discarded.
-\item \ttt{cutoff\_negev}: Default cut-off value for the negative eigenvalues. For \ttt{hwg\_rmev = 1}, the projected states giving a negative eigenvalue $<$ $-$\ttt{cutoff\_negev} 
-      will be discarded before solving the HWG equation.
+\item \ttt{cutoff\_ener}: Default cut-off value for the projected energy. The projected states with an energy $>$ \ttt{cutoff\_ener} will be discarded when reading the projected matrix elements.
 \item \ttt{cutoff\_J}: Default cut-off value for the expectation values of $J_z$ and $J^2$. The projected states with an expectation value $|\langle J_z/J^2 \rangle - K/J^2| >$ \ttt{cutoff\_J}
       will be discarded when reading the projected matrix elements.
 \item \ttt{cutoff\_A}: Default cut-off value for the expectation values of $N$, $Z$ and $A$. The projected states with an expectation value $|\langle N/Z/A \rangle - N/Z/A| >$ \ttt{cutoff\_A}
       will be discarded when reading the projected matrix elements.
+\item \ttt{cutoff\_algo}: Default cut-off value for the norm eigenvalues. For \ttt{hwg\_algo = 0}, the norm eigenstates with an eigenvalue $<$ \ttt{cutoff\_algo} will be discarded when 
+      building the natural basis. For \ttt{hwg\_algo = 1}, the generalized eigenvalues ($\alpha,\beta$), with $\beta <$ \ttt{cutoff\_algo} will be discarded.
+\item \ttt{cutoff\_negev}: Default cut-off value for the negative eigenvalues. For \ttt{hwg\_rmev = 1}, the projected states giving a negative eigenvalue $<$ $-$\ttt{cutoff\_negev} 
+      will be discarded before solving the HWG equation.
 \item \ttt{cutoff\_spec\_dim}: Number of specific cut-offs, i.e.\ cut-offs that are specific to a given angular momentum/parity block.
 \item \ttt{cutoff\_spec\_type}: Type of specific cut-off. \\[0.05cm]
- \ttt{= O\:} overlap cut-off. \\[0.05cm]
+ \ttt{= O\:} projected overlap cut-off. \\[0.05cm]
+ \ttt{= E\:} projected energy cut-off. \\[0.05cm]
+ \ttt{= J\:} projected $J_z$ and $J^2$ cut-off. \\[0.05cm]
+ \ttt{= A\:} projected $N$, $Z$ and $A$ cut-off. \\[0.05cm]
  \ttt{= S\:} small norm eigenstate cut-off. \\[0.05cm]
  \ttt{= N\:} negative eigenvalue cut-off. \\[0.05cm]
- \ttt{= J\:} $J_z$ and $J^2$ cut-off. \\[0.05cm]
- \ttt{= A\:} $N$, $Z$ and $A$ cut-off. \\[0.05cm]
  \ttt{= L\:} label cut-off. 
 \item \ttt{cutoff\_spec\_2j}: 2*$J$ of the block considered.
 \item \ttt{cutoff\_spec\_p}: $P$ of the block considered.
@@ -256,9 +259,11 @@ Cut-offs                      &          \\
 ----------------              &          \\
 Maximum number of states      &0         \\
 Cut-off projected overlap     &1.000E-06 \\
+Cut-off projected energy      &-0.00E+00 \\
+Cut-off projected <Jz/J$^2$>  &1.000E-02 \\
+Cut-off projected <N/Z/A>     &1.000E+01 \\
 Cut-off norm eigenvalues      &1.000E-06 \\
-Cut-off expect.~val.~Jz/J$^2$ &1.000E-02 \\
-Cut-off expect.~val.~N/Z/A    &1.000E+01 \\
+Cut-off |neg. eigenvalues|    &1.000E-06 \\
 No.~of specialized cut offs   &2         \\
 Example of label cut-off      &L \phantom{0}0 \phantom{0}1 1234567891234567891 \phantom{0}0  \\
 Example of overlap cut-off    &O \phantom{0}0 \phantom{0}1 1.000E-05 \\
