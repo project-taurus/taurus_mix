@@ -19,7 +19,7 @@ implicit none
 private 
 
 !!! Cosmetic input names
-character(30), dimension(31) :: input_names ! general inputs
+character(30), dimension(32) :: input_names ! general inputs
 character(30), dimension(:), allocatable :: input_spec ! special cutoffs
 
 !!! Public routines
@@ -100,11 +100,12 @@ read(uti,format1) input_names(23)
 read(uti,format1) input_names(24)
 read(uti,format4) input_names(25), cutoff_ldim  
 read(uti,format6) input_names(26), cutoff_over
-read(uti,format6) input_names(27), cutoff_algo
-read(uti,format6) input_names(28), cutoff_negev
-read(uti,format6) input_names(29), cutoff_J   
-read(uti,format6) input_names(30), cutoff_A
-read(uti,format4) input_names(31), cutoff_spec_dim
+read(uti,format6) input_names(27), cutoff_ener
+read(uti,format6) input_names(28), cutoff_J   
+read(uti,format6) input_names(29), cutoff_A
+read(uti,format6) input_names(30), cutoff_algo
+read(uti,format6) input_names(31), cutoff_negev
+read(uti,format4) input_names(32), cutoff_spec_dim
                                 
 allocate( input_spec(cutoff_spec_dim),        &
           cutoff_spec_2j(cutoff_spec_dim),    &
@@ -166,8 +167,8 @@ integer :: i
 character(3) :: hwg_Z_ch, hwg_N_ch, hwg_Zc_ch, hwg_Nc_ch, hwg_2jmin_ch, & 
                 hwg_2jmax_ch, hwg_pmin_ch, hwg_pmax_ch, hwg_Edis_ch
 character(5) :: hwg_echp_ch, hwg_echn_ch, cutoff_ldim_ch, cutoff_spec_dim_ch
-character(10) :: cutoff_over_ch, cutoff_negev_ch, cutoff_algo_ch, cutoff_J_ch, &
-                 cutoff_A_ch
+character(10) :: cutoff_over_ch, cutoff_ener_ch, cutoff_negev_ch, & 
+                 cutoff_algo_ch, cutoff_J_ch, cutoff_A_ch
 
 character(len=*), parameter :: format1 = '(1a)', &
                                format2 = '(1a30,1i1)', &
@@ -207,15 +208,17 @@ cutoff_ldim_ch = adjustl(cutoff_ldim_ch)
 cutoff_spec_dim_ch = adjustl(cutoff_spec_dim_ch)
 
 write(cutoff_over_ch,'(1es10.3)') cutoff_over
-write(cutoff_negev_ch,'(1es10.3)') cutoff_negev
-write(cutoff_algo_ch,'(1es10.3)') cutoff_algo
+write(cutoff_ener_ch,'(1es10.3)') cutoff_ener
 write(cutoff_J_ch,'(1es10.3)') cutoff_J
 write(cutoff_A_ch,'(1es10.3)') cutoff_A
+write(cutoff_negev_ch,'(1es10.3)') cutoff_negev
+write(cutoff_algo_ch,'(1es10.3)') cutoff_algo
 cutoff_over_ch = adjustl(cutoff_over_ch)
-cutoff_negev_ch= adjustl(cutoff_negev_ch)
-cutoff_algo_ch = adjustl(cutoff_algo_ch)
+cutoff_ener_ch = adjustl(cutoff_ener_ch)
 cutoff_J_ch = adjustl(cutoff_J_ch)
 cutoff_A_ch = adjustl(cutoff_A_ch)
+cutoff_negev_ch= adjustl(cutoff_negev_ch)
+cutoff_algo_ch = adjustl(cutoff_algo_ch)
 
 !!! Prints the input parameters
 print '(60("%"),/,22x,"INPUT PARAMETERS",22x,/,60("%"),/)'
@@ -245,11 +248,12 @@ write(uto,format1) input_names(23)
 write(uto,format1) input_names(24)
 write(uto,format4) input_names(25), cutoff_ldim_ch
 write(uto,format5) input_names(26), cutoff_over_ch
-write(uto,format5) input_names(27), cutoff_algo_ch
-write(uto,format5) input_names(28), cutoff_negev_ch
-write(uto,format5) input_names(29), cutoff_J_ch
-write(uto,format5) input_names(30), cutoff_A_ch
-write(uto,format4) input_names(31), cutoff_spec_dim_ch
+write(uto,format5) input_names(27), cutoff_ener_ch
+write(uto,format5) input_names(28), cutoff_J_ch
+write(uto,format5) input_names(29), cutoff_A_ch
+write(uto,format5) input_names(30), cutoff_algo_ch
+write(uto,format5) input_names(31), cutoff_negev_ch
+write(uto,format4) input_names(32), cutoff_spec_dim_ch
 do i = 1, cutoff_spec_dim
   if ( cutoff_spec_type(i) /= 'L' ) then
     write(uto,format6) input_spec(i), cutoff_spec_type(i), cutoff_spec_2j(i), &

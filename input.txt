@@ -24,10 +24,11 @@ Cut-offs
 --------
 Maximum number of states      0 
 Cut-off projected overlap     1.000E-04
+Cut-off projected energy      -1.00E-03
+Cut-off projected <Jz/J^2>    1.000E+03
+Cut-off projected <Z/N/A>     1.000E-01
 Cut-off norm eigenvalues      1.000E-06
-Cut-off negative eigenvalues  1.000E-10
-Cut-off expect. val. Jz/J^2   1.000E+03
-Cut-off expect. val. N/Z/A    1.000E-01
+Cut-off |neg. eigenvalues|    1.000E-10
 No. of specialized cut offs   0
 Specific cut-off (overlap)    O  0 +1 1.0000E-03
 Specific cut-off (small ev)   S  0 +1 1.0000E-03

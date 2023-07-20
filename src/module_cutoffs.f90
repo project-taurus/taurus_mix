@@ -18,10 +18,11 @@ public
 !!! Global cutoffs
 integer :: cutoff_ldim ! Max. number of reference states read (0 = all)
 real(r64) :: cutoff_over,  & ! Cutoff on the projected overlap 
-             cutoff_negev, & !   "    "  the negative eigenvalues
+             cutoff_ener,  & ! Cutoff on the projected energy  
+             cutoff_J,     & !   "    "   "      "     <Jz/J^2>
+             cutoff_A,     & !   "    "   "      "     <Z/N/A>
              cutoff_algo,  & !   "    "  the norm eigenvalues  
-             cutoff_J,     & !   "    "  expect. val of J/J^2
-             cutoff_A        !   "    "  expect. val of N/Z/A
+             cutoff_negev    !   "    "  the negative eigenvalues
 
 !!! Cutoffs specific to the quantum number blocks (read in inputs)
 integer :: cutoff_spec_dim, & ! Number of specific cutoffs (0 = none)
@@ -31,18 +32,18 @@ integer, dimension(:), allocatable :: cutoff_spec_2j, & ! J value of cutoff
                                       cutoff_spec_lab2k ! 2*K  of cutoff 
 integer(i64), dimension(:), allocatable :: cutoff_spec_label ! Label of cutoff
 real(r64), dimension(:), allocatable :: cutoff_spec_value   ! Value of cutoff
-character(1), dimension(:), allocatable :: cutoff_spec_type ! Type: O,N,J,A   
-
+character(1), dimension(:), allocatable :: cutoff_spec_type ! Type: O,E,J,...
 
 !!! Cutoffs specific to the quantum number blocks (same as above but now
 !!! assigned to a given block)
 integer, dimension(:,:,:), allocatable :: cutoff_block_lab2k    
 integer(i64), dimension(:,:,:), allocatable :: cutoff_block_label
 real(r64), dimension(:,:), allocatable :: cutoff_block_over,  &
-                                          cutoff_block_negev, &
-                                          cutoff_block_algo,  &
+                                          cutoff_block_ener,  &
                                           cutoff_block_J,     &
-                                          cutoff_block_A
+                                          cutoff_block_A,     &
+                                          cutoff_block_algo,  &
+                                          cutoff_block_negev
 
 CONTAINS 
 
@@ -63,6 +64,7 @@ j = 0
 ndim = cutoff_label_dim
 
 allocate ( cutoff_block_over(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax),  &
+           cutoff_block_ener(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax),  &
            cutoff_block_negev(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            cutoff_block_algo(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax),  &
            cutoff_block_J(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
@@ -74,10 +76,11 @@ if ( ialloc /= 0 ) stop 'Error during allocation of arrays for cutoffs'
 
 !!! Sets all the cutoffs using the global values 
 cutoff_block_over = cutoff_over
-cutoff_block_negev= cutoff_negev
-cutoff_block_algo = cutoff_algo
+cutoff_block_ener = cutoff_ener
 cutoff_block_J = cutoff_J
 cutoff_block_A = cutoff_A
+cutoff_block_algo = cutoff_algo
+cutoff_block_negev= cutoff_negev
 cutoff_block_label = 0
 cutoff_block_lab2k = 999
 
@@ -92,14 +95,16 @@ do i = 1, cutoff_spec_dim
  
   if ( ctype == 'O' ) then
     cutoff_block_over(n2j,np) = xvalue
-  elseif ( ctype == 'N' ) then
-    cutoff_block_negev(n2j,np) = xvalue
-  elseif ( ctype == 'S' ) then
-    cutoff_block_algo(n2j,np) = xvalue
+  elseif ( ctype == 'E' ) then
+    cutoff_block_ener(n2j,np) = xvalue
   elseif ( ctype == 'J' ) then
     cutoff_block_J(n2j,np) = xvalue
   elseif ( ctype == 'A' ) then
     cutoff_block_A(n2j,np) = xvalue
+  elseif ( ctype == 'S' ) then
+    cutoff_block_algo(n2j,np) = xvalue
+  elseif ( ctype == 'N' ) then
+    cutoff_block_negev(n2j,np) = xvalue
   elseif ( ctype == 'L' ) then
     j = j + 1
     cutoff_block_label(j,n2j,np) = lvalue
@@ -129,6 +134,9 @@ print '(/,"Cutoffs used",/,12("="),//, &
        &5x,"Type",10x,"Value",/,26("-"))'
 
 print format1, 'Proj. overlap  ', cutoff_block_over(block_2j,block_p)
+print format1, 'Proj. energy   ', cutoff_block_ener(block_2j,block_p)
+print format1, 'Proj. <Jz/J^2> ', cutoff_block_J(block_2j,block_p)
+print format1, 'Proj. <Z/N/A>  ', cutoff_block_A(block_2j,block_p)
 if ( hwg_algo == 0 ) then
   print format1, 'Norm eigenval. ', cutoff_block_algo(block_2j,block_p)
 else
@@ -137,8 +145,6 @@ endif
 if ( hwg_rmev == 1 ) then
   print format1, '|neg. eigenv.| ', cutoff_block_negev(block_2j,block_p)
 endif
-print format1, 'Exp. val. Jz/J ', cutoff_block_J(block_2j,block_p)
-print format1, 'Exp. val. Z/N/A', cutoff_block_A(block_2j,block_p)
 
 do i = 1, cutoff_label_dim
   if ( cutoff_block_label(i,block_2j,block_p) /= 0 ) then 
