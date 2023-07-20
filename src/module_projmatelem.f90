@@ -277,7 +277,7 @@ do
   xj = 0.5d0 * (-1 + sqrt(1+4*abs(xamj2/xover)))
   xt = 0.5d0 * (-1 + sqrt(1+4*abs(xist2/xover)))
   if ( abs(xover) < cutoff_block_over(n2j,np) ) icut = 1 
-  if ( abs(xener/xover) > cutoff_block_ener(n2j,np) ) icut = 1 
+  if ( xener/xover > cutoff_block_ener(n2j,np) ) icut = 1 
   if ( abs(xj - 0.5d0*block_2j) > cutoff_block_J(n2j,np) ) icut = 1
   if ( abs(xprot/xover - hwg_Z) > cutoff_block_A(n2j,np) ) icut = 1
   if ( abs(xneut/xover - hwg_N) > cutoff_block_A(n2j,np) ) icut = 1
