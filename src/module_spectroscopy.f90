@@ -53,7 +53,7 @@ real(r64), dimension(:,:,:,:,:), allocatable :: transi_E1, & ! E1 transition ELM
                                                 transi_r2m    !   "    matter  
 
 !!! Various informations
-integer :: states_odim
+integer :: states_odim, states_imax
 integer, dimension(:,:), allocatable :: states_tabijp, &
                                         warnings_norm, &
                                         warnings_cplx
@@ -1168,6 +1168,7 @@ if ( ialloc /= 0 ) stop 'Error during allocation of arrays for the spectrum'
 
 xener_tab = states_ener
 ntab = 0
+states_imax = 0
 states_tabijp = 0
   
 do i = 1, states_odim
@@ -1178,6 +1179,7 @@ do i = 1, states_odim
   n3 = ntab(3) - 2*kdelta(hwg_pmin,-1)
   xener = xener_tab(n1,n2,n3) 
   if ( xener > 666.0d0 ) exit
+  states_imax = i
   states_tabijp(i,1) = n1
   states_tabijp(i,2) = n2
   states_tabijp(i,3) = n3
@@ -1198,7 +1200,7 @@ write(utd1,'(2x,1a3,2x,"P",3x,"n",4x,"Energy",5x,"E_exc",5x,"Qs",7x,"mu", &
          &7x,"r_p",6x,"r_n",6x,"r_m",5x,"r_ch",8x,"P",11x,"Z",11x,"N",11x, & 
          &"A",10x,"J",9x,"T",/,154("-"))') char_Jleg
 
-do i = 1, states_odim
+do i = 1, states_imax
   ni = states_tabijp(i,1)
   nj = states_tabijp(i,2)
   np = states_tabijp(i,3)
@@ -1378,7 +1380,7 @@ write(utd1,'(69x,"B(Tl:i->f)",/, &
 
 ener_gs = minval(states_ener)
 
-do i = 2, states_odim
+do i = 2, states_imax
   ni = states_tabijp(i,1)
   ji = states_tabijp(i,2)
   pi = states_tabijp(i,3)
