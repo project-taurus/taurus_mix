@@ -38,7 +38,7 @@ subroutine print_version
 print '(" __________________________________________________________",/, &
       & "|                                                          |",/, &
       & "|  (______)                                                |",/, &
-      & "|  <(0  0)>   TAURUS_mix, version 2023.05.28               |",/, &
+      & "|  <(0  0)>   TAURUS_mix, version 2023.12.21               |",/, &
       & "|    (°°)                                                  |",/, &
       & "|                                                          |",/, &
       & "| This code performs the configuration mixing of symmetry  |",/, &
@@ -46,7 +46,7 @@ print '(" __________________________________________________________",/, &
       & "| equation.                                                |",/, &
       & "|                                                          |",/, &
       & "| Licence: GNU General Public License version 3 or later   |",/, &
-      & "| DOI: 10.5281/zenodo.XXXXXXX                              |",/, &
+      & "| DOI: 10.5281/zenodo.XXXXXXX (after first deposit)        |",/, &
       & "| Git: https://github.com/project-taurus/taurus_mix.git    |",/, &
       & "|                                                          |",/, &
       & "| Contributors: B. Bally, T. Rodríguez                     |",/, &

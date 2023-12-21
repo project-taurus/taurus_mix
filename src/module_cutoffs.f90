@@ -18,7 +18,7 @@ public
 !!! Global cutoffs
 integer :: cutoff_ldim ! Max. number of reference states read (0 = all)
 real(r64) :: cutoff_over,  & ! Cutoff on the projected overlap 
-             cutoff_ener,  & ! Cutoff on the projected energy  
+             cutoff_ener,  & !   "    "   "      "     energy  
              cutoff_J,     & !   "    "   "      "     <Jz/J^2>
              cutoff_A,     & !   "    "   "      "     <Z/N/A>
              cutoff_algo,  & !   "    "  the norm eigenvalues  

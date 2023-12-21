@@ -817,7 +817,16 @@ do i = 1, 5
       if ( i <= 3 ) then 
         read(utbl,iostat=iexit) label_1, label_2, j1, kj1, p1, j2, kj2, p2, &
                                 xredp, xredn
-        xred = hwg_echp * xredp + hwg_echn * xredn
+     
+        ! E1 effective charge to remove com contamination, from appendix B
+        ! in Ring and Schuck. But is it correct? They become very small!   
+        if ( (i == 1) .and. (hwg_Ac == 0) ) then
+          xred =  (hwg_N * hwg_echp / hwg_A) * xredp &
+                - (hwg_Z * hwg_echp / hwg_A) * xredn
+        else 
+          xred = hwg_echp * xredp + hwg_echn * xredn
+        endif
+
       else                 
         read(utbl,iostat=iexit) label_1, label_2, j1, kj1, p1, j2, kj2, p2, &
                                 xreda

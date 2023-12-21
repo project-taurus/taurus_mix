@@ -1342,8 +1342,8 @@ character(2) :: namet
 character(4) :: chJileg, chJfleg
 character(5) :: chJi, chJf
 character(len=*), parameter :: format1 = '(1a5,2x,1a1,1i4,1f8.3,1a5,2x,1a1,1i4,&
-                                          &2f8.3,5x,1a2,2f14.6)', &
-                               format2 = '(53x,1a2,2f14.6)'
+                                          &2f8.3,5x,1a2,2f16.8)', &
+                               format2 = '(53x,1a2,2f16.8)'
  
 print '(/,60("%"),/,16x,"ELECTROMAGNETIC TRANSITIONS",/,60("%"))'
 
@@ -1366,14 +1366,14 @@ chJfleg = char_Jleg // 'f'
 nucleus_A = hwg_A + hwg_Ac
 
 print '(/,"Displayed up to E_exc = ",1i3," MeV",/,31("="),/, &
-       &67x,"B(Tl:i->f)",/, &
+       &69x,"B(Tl:i->f)",/, &
        &1x,1a4,1x,"Pi",2x,"ni",3x,"Ei_ex",1x,1a4,1x,"Pf",2x,"nf",3x,"Ef_ex",&
-       &3x,"Ei-Ef",4x,"Type",6x,"(e fm)",8x,"(wu)",/,83("-"))', hwg_Edis, &
+       &3x,"Ei-Ef",4x,"Type",7x,"(e fm)",10x,"(wu)",/,87("-"))', hwg_Edis, &
        chJileg, chJfleg
 
-write(utd1,'(67x,"B(Tl:i->f)",/, &
+write(utd1,'(69x,"B(Tl:i->f)",/, &
         &1x,1a4,1x,"Pi",2x,"ni",3x,"Ei_ex",1x,1a4,1x,"Pf",2x,"nf",3x,"Ef_ex",&
-        &3x,"Ei-Ef",4x,"Type",6x,"(e fm)",8x,"(wu)",/,83("-"))') chJileg, & 
+        &3x,"Ei-Ef",4x,"Type",7x,"(e fm)",10x,"(wu)",/,87("-"))') chJileg, & 
         chJfleg
 
 ener_gs = minval(states_ener)
@@ -1434,6 +1434,7 @@ do i = 2, states_odim
       !!! Select the type of transition
       select case (k)
         case (0)
+          ! ATTENTION: never benchmarked. Need to check definition & factor!
           namet = 'E0'
           lt = 0
           pt = +1  
@@ -1493,7 +1494,7 @@ do i = 2, states_odim
       proba_fm = reduced_me**2 / (j1 + 1)  
       proba_wu = proba_fm / factor_conv
 
-      if ( proba_fm < 1.d-6 ) cycle 
+      if ( proba_fm < 5.d-8 ) cycle 
 
       chPi = adjustr(char_P(pi))
       chJi = adjustr(char_J(ji))
@@ -1501,6 +1502,7 @@ do i = 2, states_odim
       chJf = adjustr(char_J(jf))
 
       !!! Printing
+      ! Remark: possibly adapt the printing to the value (B(M1) are small)
       tprem = tprem + 1
         
       if ( tprem == 1 ) then 
@@ -1644,7 +1646,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
               proba_fm = reduced_me**2 / (j1 + 1)  
               proba_wu = proba_fm / factor_conv
         
-              if ( proba_fm < 1.d-6 ) cycle 
+              if ( proba_fm < 5.d-8 ) cycle 
 
               chPi = adjustr(char_P(pi))
               chJi = adjustr(char_J(ji))
