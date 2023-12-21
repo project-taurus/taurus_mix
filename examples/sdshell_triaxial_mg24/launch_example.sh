@@ -56,6 +56,7 @@ done
 ./$code < input.txt > results
     
 echo "The results can be found in the files: results, out/*txt"
+echo "They can be compared to the benchmark calculation: diff results data/results_benchmark"
 
 # Clean up
 rm -f $code input.txt projmatelem.tar.gz *.bin

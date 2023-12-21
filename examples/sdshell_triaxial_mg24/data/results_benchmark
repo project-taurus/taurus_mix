@@ -1,7 +1,7 @@
  __________________________________________________________
 |                                                          |
 |  (______)                                                |
-|  <(0  0)>   TAURUS_mix, version 2023.05.28               |
+|  <(0  0)>   TAURUS_mix, version 2023.12.21               |
 |    (°°)                                                  |
 |                                                          |
 | This code performs the configuration mixing of symmetry  |
@@ -9,7 +9,7 @@
 | equation.                                                |
 |                                                          |
 | Licence: GNU General Public License version 3 or later   |
-| DOI: 10.5281/zenodo.XXXXXXX                              |
+| DOI: 10.5281/zenodo.XXXXXXX (after first deposit)        |
 | Git: https://github.com/project-taurus/taurus_mix.git    |
 |                                                          |
 | Contributors: B. Bally, T. Rodríguez                     |
@@ -45,10 +45,11 @@ Cut-offs
 --------                      
 Maximum number of states      0    
 Cut-off projected overlap     1.000E-04 
+Cut-off projected energy      -0.000E+00
+Cut-off projected <Jz/J^2>    1.000E-03 
+Cut-off projected >N/Z/A>     1.000E-01 
 Cut-off norm eigenvalues      1.000E-06 
 Cut-off negative eigenvalues  1.000E-10 
-Cut-off expect. val. Jz/J^2   1.000E-03 
-Cut-off expect. val. N/Z/A    1.000E-01 
 No. of specialized cut offs   0    
   
 The file with the occupation numbers (projmatelem_occnumb.bin) can not be found.
@@ -63,9 +64,10 @@ Cutoffs used
      Type          Value
 --------------------------
 Proj. overlap    1.000E-04
+Proj. energy    -0.000E+00
+Proj. <Jz/J^2>   1.000E-03
+Proj. <Z/N/A>    1.000E-01
 Norm eigenval.   1.000E-06
-Exp. val. Jz/J   1.000E-03
-Exp. val. Z/N/A  1.000E-01
 
 States selected
 ===============
@@ -115,9 +117,10 @@ Cutoffs used
      Type          Value
 --------------------------
 Proj. overlap    1.000E-04
+Proj. energy    -0.000E+00
+Proj. <Jz/J^2>   1.000E-03
+Proj. <Z/N/A>    1.000E-01
 Norm eigenval.   1.000E-06
-Exp. val. Jz/J   1.000E-03
-Exp. val. Z/N/A  1.000E-01
 
 States discarded
 ================
@@ -146,9 +149,10 @@ Cutoffs used
      Type          Value
 --------------------------
 Proj. overlap    1.000E-04
+Proj. energy    -0.000E+00
+Proj. <Jz/J^2>   1.000E-03
+Proj. <Z/N/A>    1.000E-01
 Norm eigenval.   1.000E-06
-Exp. val. Jz/J   1.000E-03
-Exp. val. Z/N/A  1.000E-01
 
 States discarded
 ================
@@ -223,9 +227,10 @@ Cutoffs used
      Type          Value
 --------------------------
 Proj. overlap    1.000E-04
+Proj. energy    -0.000E+00
+Proj. <Jz/J^2>   1.000E-03
+Proj. <Z/N/A>    1.000E-01
 Norm eigenval.   1.000E-06
-Exp. val. Jz/J   1.000E-03
-Exp. val. Z/N/A  1.000E-01
 
 States discarded
 ================
@@ -299,9 +304,10 @@ Cutoffs used
      Type          Value
 --------------------------
 Proj. overlap    1.000E-04
+Proj. energy    -0.000E+00
+Proj. <Jz/J^2>   1.000E-03
+Proj. <Z/N/A>    1.000E-01
 Norm eigenval.   1.000E-06
-Exp. val. Jz/J   1.000E-03
-Exp. val. Z/N/A  1.000E-01
 
 States discarded
 ================
@@ -430,27 +436,27 @@ Displayed up to E_exc =  10 MeV
 
 Displayed up to E_exc =  10 MeV
 ===============================
-                                                                   B(Tl:i->f)
-   Ji Pi  ni   Ei_ex   Jf Pf  nf   Ef_ex   Ei-Ef    Type      (e fm)        (wu)
------------------------------------------------------------------------------------
-    2  +   1   1.270    0  +   1   0.000   1.270     E2     93.488474     22.734739
-    2  +   2   3.879    0  +   1   0.000   3.879     E2      0.557138      0.135486
-    2  +   2   3.879    2  +   1   1.270   2.608     E2     12.465019      3.031272
-                                                     M1      0.000007      0.000004
-    4  +   1   4.061    2  +   1   1.270   2.791     E2    123.455774     30.022255
-    4  +   1   4.061    2  +   2   3.879   0.183     E2      2.042419      0.496680
-    3  +   1   4.868    2  +   1   1.270   3.598     E2     10.002711      2.432482
-                                                     M1      0.000004      0.000002
-    3  +   1   4.868    2  +   2   3.879   0.989     E2      0.001263      0.000307
-                                                     M1      0.000066      0.000037
-    3  +   1   4.868    4  +   1   4.061   0.807     E2      8.141544      1.979879
-                                                     M1      0.000005      0.000003
-    4  +   2   6.045    2  +   1   1.270   4.775     E2      0.842012      0.204762
-    4  +   2   6.045    2  +   2   3.879   2.167     E2     51.348630     12.487076
-    4  +   2   6.045    4  +   1   4.061   1.984     E2     14.308350      3.479537
-                                                     M1      0.000042      0.000024
-    4  +   2   6.045    3  +   1   4.868   1.177     E2      0.655077      0.159303
-                                                     M1      0.000011      0.000006
+                                                                     B(Tl:i->f)
+   Ji Pi  ni   Ei_ex   Jf Pf  nf   Ef_ex   Ei-Ef    Type       (e fm)          (wu)
+---------------------------------------------------------------------------------------
+    2  +   1   1.270    0  +   1   0.000   1.270     E2     93.48847442     22.73473897
+    2  +   2   3.879    0  +   1   0.000   3.879     E2      0.55713784      0.13548604
+    2  +   2   3.879    2  +   1   1.270   2.608     E2     12.46501948      3.03127167
+                                                     M1      0.00000677      0.00000378
+    4  +   1   4.061    2  +   1   1.270   2.791     E2    123.45577356     30.02225466
+    4  +   1   4.061    2  +   2   3.879   0.183     E2      2.04241928      0.49668015
+    3  +   1   4.868    2  +   1   1.270   3.598     E2     10.00271101      2.43248192
+                                                     M1      0.00000397      0.00000222
+    3  +   1   4.868    2  +   2   3.879   0.989     E2      0.00126305      0.00030715
+                                                     M1      0.00006565      0.00003668
+    3  +   1   4.868    4  +   1   4.061   0.807     E2      8.14154387      1.97987908
+                                                     M1      0.00000466      0.00000260
+    4  +   2   6.045    2  +   1   1.270   4.775     E2      0.84201150      0.20476226
+    4  +   2   6.045    2  +   2   3.879   2.167     E2     51.34862988     12.48707612
+    4  +   2   6.045    4  +   1   4.061   1.984     E2     14.30834980      3.47953691
+                                                     M1      0.00004222      0.00002359
+    4  +   2   6.045    3  +   1   4.868   1.177     E2      0.65507700      0.15930311
+                                                     M1      0.00001131      0.00000632
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     COMPLEMENTARY FILES

@@ -34,6 +34,7 @@ tar -xf projmatelem.tar.gz
 ./$code < input.txt > results
     
 echo "The results can be found in the files: results, out/*txt"
+echo "They can be compared to the benchmark calculation: diff results data/results_benchmark"
 
 # Clean up
 rm -f $code input.txt projmatelem_states.bin projmatelem_E2.bin projmatelem.tar.gz
