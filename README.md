@@ -1,5 +1,6 @@
 # TAURUS_mix 
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10419912.svg)](https://doi.org/10.5281/zenodo.10419912)
 [![License: GPL v3](https://img.shields.io/github/license/project-taurus/taurus_mix)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Presentation

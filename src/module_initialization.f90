@@ -46,7 +46,7 @@ print '(" __________________________________________________________",/, &
       & "| equation.                                                |",/, &
       & "|                                                          |",/, &
       & "| Licence: GNU General Public License version 3 or later   |",/, &
-      & "| DOI: 10.5281/zenodo.XXXXXXX (after first deposit)        |",/, &
+      & "| DOI: 10.5281/zenodo.10419912                             |",/, &
       & "| Git: https://github.com/project-taurus/taurus_mix.git    |",/, &
       & "|                                                          |",/, &
       & "| Contributors: B. Bally, T. Rodríguez                     |",/, &
