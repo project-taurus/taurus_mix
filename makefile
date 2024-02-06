@@ -98,7 +98,7 @@ $(OBJDIR)/module_cutoffs.o: $(OBJDIR)/module_parameters.o
 
 $(OBJDIR)/module_projmatelem.o: $(OBJDIR)/module_cutoffs.o
 
-$(OBJDIR)/module_spectroscopy.o: $(OBJDIR)/module_projmatelem.o
+$(OBJDIR)/module_spectroscopy.o: $(OBJDIR)/module_projmatelem.o $(OBJDIR)/module_mathmethods.o
 
 $(OBJDIR)/module_initialization.o: $(OBJDIR)/module_cutoffs.o
 
