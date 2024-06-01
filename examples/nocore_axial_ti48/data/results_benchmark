@@ -1,7 +1,7 @@
  __________________________________________________________
 |                                                          |
 |  (______)                                                |
-|  <(0  0)>   TAURUS_mix, version 2023.12.21               |
+|  <(0  0)>   TAURUS_mix, version 2024.06.01               |
 |    (°°)                                                  |
 |                                                          |
 | This code performs the configuration mixing of symmetry  |
@@ -9,7 +9,7 @@
 | equation.                                                |
 |                                                          |
 | Licence: GNU General Public License version 3 or later   |
-| DOI: 10.5281/zenodo.XXXXXXX (after first deposit)        |
+| DOI: 10.5281/zenodo.10419912                             |
 | Git: https://github.com/project-taurus/taurus_mix.git    |
 |                                                          |
 | Contributors: B. Bally, T. Rodríguez                     |
@@ -503,8 +503,8 @@ Spectrum (sorted E)      : spectrum_sorted_energy.txt
 Spectrum (sorted J^pi)   : spectrum_sorted_spinparity.txt
 Transitions (sorted E)   : transitions_sorted_energy.txt
 Transitions (sorted J^pi): transitions_sorted_spinparity.txt
-Collective wave function : collective_wavefunction_0+.txt                    
-Collective wave function : collective_wavefunction_2+.txt                    
-Collective wave function : collective_wavefunction_4+.txt                    
+Collective wave function : collective_wavefunction_0p.txt                    
+Collective wave function : collective_wavefunction_2p.txt                    
+Collective wave function : collective_wavefunction_4p.txt                    
 
 This is the end, my only friend, the end.

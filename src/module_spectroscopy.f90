@@ -356,8 +356,8 @@ character(len=*), parameter :: format1 = '(10es14.6)', &
 !!! Opens the data files to write the information
 !!!
 
-chP = adjustr(char_P(block_p))
-chJ = adjustr(char_J(block_2j))
+chP = adjustr(chfile_P(block_p))
+chJ = adjustr(chfile_J(block_2j))
 
 namefile = "convergence_norm_eigenvalues_" // trim(adjustl(chJ)) // &
            trim(chP) // ".txt"
@@ -560,8 +560,8 @@ character(len=*), parameter :: format1 = '(10es14.6)', &
 !!! Opens the data files to write the information
 !!!
 
-chP = adjustr(char_P(block_p))
-chJ = adjustr(char_J(block_2j))
+chP = adjustr(chfile_P(block_p))
+chJ = adjustr(chfile_J(block_2j))
 
 namefile = "collective_wavefunction_" // trim(adjustl(chJ)) // &
            trim(chP) // ".txt"
@@ -792,8 +792,8 @@ character(len=*), parameter :: format1 = "(5i6,1i9,2f13.6)", &
                                format2 = "(9x,1a3,27x,2f13.6)"
 
 !!! Opens the data files to write the information
-chP = adjustr(char_P(block_p))
-chJ = adjustr(char_J(block_2j))
+chP = adjustr(chfile_P(block_p))
+chJ = adjustr(chfile_J(block_2j))
 
 namefile = "occupation_numbers_" // trim(adjustl(chJ)) // &
            trim(chP) // ".txt"
@@ -1085,8 +1085,8 @@ endif
 
 do n2j = hwg_2jmin, k, 2
   do np = hwg_pmax, hwg_pmin, -2
-    chP = adjustr(char_P(np))
-    chJ = adjustr(char_J(n2j))
+    chP = adjustr(chfile_P(np))
+    chJ = adjustr(chfile_J(n2j))
 
     namefile = "convergence_norm_eigenvalues_" // trim(adjustl(chJ)) // &
                trim(chP) // ".txt"
@@ -1099,8 +1099,8 @@ enddo
 !!! Collective wave functions
 do n2j = hwg_2jmin, hwg_2jmax, 2
   do np = hwg_pmax, hwg_pmin, -2
-    chP = adjustr(char_P(np))
-    chJ = adjustr(char_J(n2j))
+    chP = adjustr(chfile_P(np))
+    chJ = adjustr(chfile_J(n2j))
 
     namefile = "collective_wavefunction_" // trim(adjustl(chJ)) // &
                trim(chP) // ".txt"
@@ -1113,8 +1113,8 @@ enddo
 !!! Occupation numbers
 do n2j = hwg_2jmin, hwg_2jmax, 2
   do np = hwg_pmax, hwg_pmin, -2
-    chP = adjustr(char_P(np))
-    chJ = adjustr(char_J(n2j))
+    chP = adjustr(chfile_P(np))
+    chJ = adjustr(chfile_J(n2j))
 
     namefile = "occupation_numbers_" // trim(adjustl(chJ)) // &
                trim(chP) // ".txt"

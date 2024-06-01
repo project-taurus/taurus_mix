@@ -46,8 +46,8 @@ integer, dimension(:), allocatable :: HOsh_n,  & ! quantum number  n
 
 !!! Quantum numbers written as nice characters
 character(3) :: char_Jleg, char_Kleg 
-character(1), dimension(:), allocatable :: char_P
-character(5), dimension(:), allocatable :: char_J
+character(1), dimension(:), allocatable :: char_P, chfile_P
+character(5), dimension(:), allocatable :: char_J, chfile_J
 character(7), dimension(:,:), allocatable :: char_JP
 
 !!! Switch to read/calculate the different observables
@@ -78,6 +78,7 @@ integer :: j, p, ialloc=0
 character(3) :: temp1
 
 allocate ( char_J(hwg_2jmin:hwg_2jmax), char_P(hwg_pmin:hwg_pmax), &
+           chfile_J(hwg_2jmin:hwg_2jmax), chfile_P(hwg_pmin:hwg_pmax), &
            char_JP(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            stat=ialloc )
 if ( ialloc /= 0 ) stop 'Error during allocation of arrays for the characters'   
@@ -87,18 +88,22 @@ do j = hwg_2jmin, hwg_2jmax, 2
   if ( (-1)**j == -1 ) then
     write(temp1,'(1i3)') j
     char_J(j) = adjustr(temp1) // '/2'
+    chfile_J(j) = adjustr(temp1) 
   else
     write(temp1,'(1i3)') j/2
     char_J(j) = '  ' // adjustr(temp1) 
+    chfile_J(j) = adjustr(temp1) 
   endif
 enddo
 
 !!! Parity
 do p = hwg_pmin, hwg_pmax, 2
   if ( p == -1 ) then 
-    char_P(p) = '-'
+    char_P(p)   = '-'
+    chfile_P(p) = 'm'
   else
-    char_P(p) = '+'
+    char_P(p)   = '+'
+    chfile_P(p) = 'p'
   endif
 enddo
 
