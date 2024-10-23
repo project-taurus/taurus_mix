@@ -542,6 +542,7 @@ do j = 1, projme_bdim(0,block_p,1)
     projme_nucl(i,j) = projme_nucl(i,j) * factor
     projme_amj2(i,j) = projme_amj2(i,j) * factor
     projme_ist2(i,j) = projme_ist2(i,j) * factor
+    projme_r2so(i,j) = projme_r2so(i,j) * factor
     projme_r2p(i,j,0) = projme_r2p(i,j,0) * factor
     projme_r2n(i,j,0) = projme_r2n(i,j,0) * factor
     projme_r2m(i,j,0) = projme_r2m(i,j,0) * factor

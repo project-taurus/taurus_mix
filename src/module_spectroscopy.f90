@@ -1242,7 +1242,7 @@ do i = 1, states_imax
   xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) ) 
   xr2m  = sqrt( transi_r2m(ni,ni,nj,np,0) ) 
   xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
-          + radius_rp2 + (hwg_N / hwg_Z) * radius_rn2 &
+          + radius_rp2 + (hwg_N * one / hwg_Z) * radius_rn2 &
           + 0.75d0 * (hbarc / mass_ma)**2 &
           + (one / hwg_Z) * ((hbarc / mass_ma)**2) * xr2so )
 
@@ -1305,7 +1305,7 @@ do nj = hwg_2jmin, hwg_2jmax, 2
       xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) ) 
       xr2m  = sqrt( transi_r2m(ni,ni,nj,np,0) ) 
       xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
-              + radius_rp2 + (hwg_N / hwg_Z) * radius_rn2 &
+              + radius_rp2 + (hwg_N * one / hwg_Z) * radius_rn2 &
               + 0.75d0 * (hbarc / mass_ma)**2 &
               + (one / hwg_Z) * ((hbarc / mass_ma)**2) * xr2so )
 
