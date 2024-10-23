@@ -763,7 +763,7 @@ integer :: i, jf, kjf, tf, ktf, pf, ji, kji, ti, kti, pi, &
            lt, idx_i, idx_f, dj, utbl, iexit
 integer(i64) :: label_f, label_i, label_1, label_2
 integer, dimension(1) :: loclab
-real(r64) :: factor, factor2, xred, xredp, xredn, xreda
+real(r64) :: factor, factor2, xred, xredp, xredn, xreda, echn
 logical :: do_Tl
 
 !!! B(Tl) transitions
@@ -820,12 +820,17 @@ do i = 1, 5
                                 xredp, xredn
      
         ! E1 effective charge to remove com contamination, from appendix B
-        ! in Ring and Schuck. But is it correct? They become very small!   
-        if ( (i == 1) .and. (hwg_Ac == 0) ) then
+        ! in Ring and Schuck.    
+        if ( i == 1 ) then
+     
+          if ( hwg_Ac == 0 ) then 
+            echn = hwg_echp
+          else 
+            echn = hwg_echn
+          endif
+
           xred =  (hwg_N * hwg_echp / hwg_A) * xredp &
-                - (hwg_Z * hwg_echp / hwg_A) * xredn
-        else 
-          xred = hwg_echp * xredp + hwg_echn * xredn
+                - (hwg_Z *     echn / hwg_A) * xredn
         endif
 
       else                 
