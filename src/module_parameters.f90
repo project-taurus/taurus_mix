@@ -22,12 +22,15 @@ integer :: hwg_phys,   & ! Type of physics (0=spectroscopy)
            hwg_rmev,   & !    "   "  remove states giving large negative ev
            hwg_conv,   & !    "   "  perform convergence analysis (norm ev)
            hwg_read,   & !    "   "  read the weights from a file
-           hwg_Z,      & ! Number of active protons Z                               
-           hwg_N,      & !    "   "    "    neutrons N
-           hwg_A,      & !    "   "    "    nucleons A
-           hwg_Zc,     & ! Number of core protons Z                               
+           hwg_Zv,     & ! Number of active protons Z (v = valence)                 
+           hwg_Nv,     & !    "   "    "    neutrons N
+           hwg_Av,     & !    "   "    "    nucleons A
+           hwg_Zc,     & ! Number of core protons Z (c = core)                    
            hwg_Nc,     & !    "   "   "   neutrons N
            hwg_Ac,     & !    "   "   "   nucleons A
+           hwg_Zn,     & ! Total number of protons Z (n = nucleus)    
+           hwg_Nn,     & !    "    "    "  neutrons N 
+           hwg_An,     & !    "    "    "  nucleons A
            hwg_2jmin,  & ! Minimum value for twice the angular momentum 2*J
            hwg_2jmax,  & ! Maximum   "    "    "    "    "        "      "
            hwg_pmin,   & ! Minimum value for the parity P

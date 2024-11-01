@@ -9,8 +9,8 @@ Max(E_exc) displayed (Mev)    15
 
 Quantum numbers
 ---------------
-Number of active protons  Z   22  
-Number of active neutrons N   26  
+Number of active protons  Zv  22
+Number of active neutrons Nv  26
 Number of core protons  Zc    0   
 Number of core neutrons Nc    0   
 Angular momentum min(2*J)     0    

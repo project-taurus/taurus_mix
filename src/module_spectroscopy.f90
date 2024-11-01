@@ -55,8 +55,10 @@ real(r64), dimension(:,:,:,:,:), allocatable :: transi_E1, & ! E1 transition ELM
 !!! Various informations
 integer :: states_odim, states_imax
 integer, dimension(:,:), allocatable :: states_tabijp, &
+                                        states_cdim, &
                                         warnings_norm, &
                                         warnings_cplx
+integer, dimension(:,:,:), allocatable :: states_notzero
 
 CONTAINS
 
@@ -82,6 +84,8 @@ allocate ( states_ener(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            states_ist2(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            states_r2so(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            states_occn(ndim,HOsh_dim,2), &
+           states_notzero(ndim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
+           states_cdim(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            warnings_norm(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            warnings_cplx(hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            weights_f(ndim,ndim,-3:0,hwg_pmin:hwg_pmax,1), &
@@ -97,6 +101,8 @@ states_amj2 = zero
 states_ist2 = zero
 states_r2so = zero
 states_occn = zero
+states_notzero = 0      
+states_cdim = 0      
 warnings_norm = 0
 warnings_cplx = 0
 weights_f = zero
@@ -214,7 +220,7 @@ if ( (r2jmin > hwg_2jmax) .or. (r2jmax < hwg_2jmin) ) ierr = ierr + 1
 if ( (l2jmin > hwg_2jmax) .or. (l2jmax < hwg_2jmin) ) ierr = ierr + 1
 if ( (rpmin > hwg_pmax) .or. (rpmax < hwg_pmin)  ) ierr = ierr + 1
 if ( (lpmin > hwg_pmax) .or. (lpmax < hwg_pmin)  ) ierr = ierr + 1
-if ( (hwg_phys == 0) .and. ((rZ /= hwg_Z) .or. (rN /= hwg_N)) ) ierr = ierr + 1
+if ( (hwg_phys == 0) .and. ((rZ /= hwg_Zv) .or. (rN /= hwg_Nv)) ) ierr = ierr+1
 
 if ( ierr == 0 ) then
   print '(/,a,/,a)','Warning: the code takes into account the combined min/max &
@@ -404,6 +410,7 @@ do i = 1, ndim
   cdim = i
 enddo
 
+states_cdim(block_2j,block_p) = cdim
 warnings_norm(block_2j,block_p) = zdim
 
 print '(/,"Number of norm eigenvalues < zero_eps   :",1i5)', zdim
@@ -454,9 +461,9 @@ print '(/,"Energy eigenvectors",/,19("="),//, &
        &4x,"i",6x,"Energy", &
        &9x,"P",11x,"Z",11x,"N",11x,"A",10x,"J",9x,"T",/,87("-"))'
 
-!!! If the convergence analysis option is on, the diagonalization can be 
-!!! performed several times, increasing the number of norm eigenvalues included
-!!! in the calculation.
+!!! If the convergence analysis option is on, the diagonalization is performed
+!!! several times, increasing the number of norm eigenvalues included in the
+!!! calculation.
 if ( hwg_conv == 0 ) then
   imin = ndim-cdim
 else
@@ -471,14 +478,37 @@ do i = imin, ndim-cdim
 
   call dgemm('t','n',ndim,ndim,ndim,one,L,ndim,C,ndim,zero,A,ndim)
   call dgemm('n','n',ndim,ndim,ndim,one,A,ndim,L,ndim,zero,C,ndim)
+
+  !!! Sets the energy of the zero blocks to a very high value (to be ignored)
+  do k = 1, ndim
+    if ( sum(abs(C(k,:))) < zero_eps ) C(k,k) = 100000.d0
+  enddo
+
+  !!! Diagonalization
   call dsyev('V','U',ndim,C,ndim,eigen_ener,work1,3*ndim-1,info)
 
+  !!! Weights F
   call dgemm('n','n',ndim,ndim,ndim,one,L,ndim,C,ndim,zero,F,ndim)
 
+  !!! Properties of the states
   call calculate_properties_spectrum(F(1:ndim,1:ndim),block_2j,block_p,ndim)
   states_ener(1:ndim,block_2j,block_p) = eigen_ener(:)
 
-  do k = 1, i
+  !!! Tag the states that are non-vanishing     
+  if ( i == ndim-cdim ) then 
+    states_notzero(:,block_2j,block_p) = 0 
+    
+    do k = 1, ndim
+      if (     states_ener(k,block_2j,block_p)  < 99999.0d0 .and. &
+           abs(states_pari(k,block_2j,block_p)) > zero_eps  .and. &
+           abs(states_nucl(k,block_2j,block_p)) > zero_eps ) then   
+        states_notzero(k,block_2j,block_p) = 1
+      endif 
+    enddo
+  endif
+
+  !!! Prints/writes the properties
+  do k = 1, min(i,ndim-cdim) 
     xener = states_ener(k,block_2j,block_p)
     xpari = states_pari(k,block_2j,block_p)
     xprot = states_prot(k,block_2j,block_p)
@@ -526,7 +556,8 @@ end subroutine solve_hwg_sqrt
 !------------------------------------------------------------------------------!
 ! subroutine solve_hwg_qz                                                      !
 !                                                                              !
-! Solves the HWG equation using the QZ algorithm implemented in LAPACK.        !
+! Solves the HWG equation using the QZ algorithm implemented in LAPACK. This   !
+! option is experimental and should be avoided if possible.                    !
 !                                                                              !
 ! Additionally, the collective wave functions are computed.                    !
 !                                                                              !
@@ -959,7 +990,7 @@ if ( (block_2j == hwg_2jmin) .and. (block_p == hwg_pmin) ) then
              form='formatted')
 
   write(utrw,format1) projme_tdim, hwg_2jmin, hwg_2jmax, hwg_pmin, hwg_pmax, &
-                      hwg_Z, hwg_N
+                      hwg_Zv, hwg_Nv
 endif
 
 write(utrw,format2) block_2j, block_p, projme_bdim(0,block_p,1),  & 
@@ -1138,7 +1169,8 @@ subroutine print_spectrum
 integer :: i, ni, nj, np, n1, n2, n3, ialloc=0
 integer, dimension(3) :: ntab
 real(r64) :: xener, xexci, xener_gs, xpari, xprot, xneut, xnucl, xamj2, xist2, &
-             xj, xt, xqs, xmu, xr2p, xr2n, xr2m, xr2so, xr2ch, cg
+             xj, xt, xqs, xmu, xr2p=0.d0, xr2n=0.d0, xr2m=0.d0, xr2so, & 
+             xr2ch=0.d0, cg
 real(r64), dimension(:,:,:), allocatable :: xener_tab
 character(1) :: chP
 character(5) :: chJ
@@ -1160,13 +1192,19 @@ open(utd2, file='spectrum_sorted_spinparity.txt', status='replace', &
 !!! Sorts the spectrum by excitation energy 
 !!!
 states_odim = projme_tdim * ((hwg_2jmax-hwg_2jmin+2)/2) &
-                          * ((hwg_pmax-hwg_pmin+2)/2)
+                          * ((hwg_pmax-hwg_pmin+2)/2)   &
+              - sum(states_cdim)
 
 allocate ( xener_tab(projme_tdim,hwg_2jmin:hwg_2jmax,hwg_pmin:hwg_pmax), &
            states_tabijp(states_odim,3), stat=ialloc )
 if ( ialloc /= 0 ) stop 'Error during allocation of arrays for the spectrum'
 
-xener_tab = states_ener
+where ( states_notzero == 1 ) 
+  xener_tab = states_ener
+elsewhere
+  xener_tab = 100000.0d0
+end where
+
 ntab = 0
 states_imax = 0
 states_tabijp = 0
@@ -1178,12 +1216,12 @@ do i = 1, states_odim
   n2 = ntab(2) + hwg_2jmin - 1
   n3 = ntab(3) - 2*kdelta(hwg_pmin,-1)
   xener = xener_tab(n1,n2,n3) 
-  if ( xener > 666.0d0 ) exit
+  if ( xener > 99999.0d0 ) exit 
   states_imax = i
   states_tabijp(i,1) = n1
   states_tabijp(i,2) = n2
   states_tabijp(i,3) = n3
-  xener_tab(n1,n2,n3) = 667.0d0
+  xener_tab(n1,n2,n3) = 100001.0d0
 enddo
  
 xener_gs = minval(states_ener)
@@ -1206,9 +1244,9 @@ do i = 1, states_imax
   np = states_tabijp(i,3)
 
   xener = states_ener(ni,nj,np)
-  xexci =  xener - xener_gs
+  xexci = xener - xener_gs
 
-  if ( xener > -zero_eps ) cycle
+  if ( xener > 99999.0 ) cycle
   if ( ni > 999 ) cycle 
 
   xpari = states_pari(ni,nj,np)
@@ -1240,11 +1278,14 @@ do i = 1, states_imax
   !!! Reinhard.2021.PhysRevC.103.054310)
   xr2p  = sqrt( transi_r2p(ni,ni,nj,np,0) ) 
   xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) ) 
-  xr2m  = sqrt( transi_r2m(ni,ni,nj,np,0) ) 
-  xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
-          + radius_rp2 + (hwg_N * one / hwg_Z) * radius_rn2 &
-          + 0.75d0 * (hbarc / mass_ma)**2 &
-          + (one / hwg_Z) * ((hbarc / mass_ma)**2) * xr2so )
+  xr2m  = sqrt( transi_r2m(ni,ni,nj,np,0) )
+  if ( xr2p > zero_eps ) then
+    xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
+            + radius_rp2 + (hwg_Nn * one / hwg_Zn) * radius_rn2 &
+            + 0.75d0 * (hbarc / mass_ma)**2 &
+            + (one / hwg_Zn) * ((hbarc / mass_ma)**2) * xr2so )
+  endif
+
 
   chP = adjustr(char_P(np))
   chJ = adjustr(char_J(nj))
@@ -1269,11 +1310,10 @@ do nj = hwg_2jmin, hwg_2jmax, 2
   do np = hwg_pmax, hwg_pmin, -2
     do ni = 1, projme_tdim
 
-      xener = states_ener(ni,nj,np)
-      xexci =  xener - xener_gs
+      if ( states_notzero(ni,nj,np) == 0 ) cycle
 
-      if ( xener > -zero_eps ) cycle
-      if ( ni > 999 ) cycle 
+      xener = states_ener(ni,nj,np)
+      xexci = xener - xener_gs
 
       xpari = states_pari(ni,nj,np)
       xprot = states_prot(ni,nj,np)
@@ -1304,10 +1344,12 @@ do nj = hwg_2jmin, hwg_2jmax, 2
       xr2p  = sqrt( transi_r2p(ni,ni,nj,np,0) ) 
       xr2n  = sqrt( transi_r2n(ni,ni,nj,np,0) ) 
       xr2m  = sqrt( transi_r2m(ni,ni,nj,np,0) ) 
-      xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
-              + radius_rp2 + (hwg_N * one / hwg_Z) * radius_rn2 &
-              + 0.75d0 * (hbarc / mass_ma)**2 &
-              + (one / hwg_Z) * ((hbarc / mass_ma)**2) * xr2so )
+      if ( xr2p > zero_eps ) then
+        xr2ch = sqrt( transi_r2p(ni,ni,nj,np,0) &
+                + radius_rp2 + (hwg_Nn * one / hwg_Zn) * radius_rn2 &
+                + 0.75d0 * (hbarc / mass_ma)**2 &
+                + (one / hwg_Zn) * ((hbarc / mass_ma)**2) * xr2so )
+      endif
 
       chP = adjustr(char_P(np))
       chJ = adjustr(char_J(nj))
@@ -1336,7 +1378,7 @@ end subroutine print_spectrum
 subroutine print_transitions_elm
 
 integer :: i, f, k, ni, nf, ji, jf, dj, pi, pf, dp, lt, pt, ltmin, ltmax, & 
-           n1, n2, j1, j2, p1, p2, mdj, jfmin, jfmax, tprem, nucleus_A
+           n1, n2, j1, j2, p1, p2, mdj, jfmin, jfmax, tprem
 real(r64) :: ei, ef, de, exci, excf, ener_gs, proba_fm, proba_wu, reduced_me, &
              factor_conv
 character(1) :: chPi, chPf
@@ -1365,8 +1407,6 @@ open(utd2, file='transitions_sorted_spinparity.txt', status='replace', &
 chJileg = char_Jleg // 'i'
 chJfleg = char_Jleg // 'f'
 
-nucleus_A = hwg_A + hwg_Ac
-
 print '(/,"Displayed up to E_exc = ",1i3," MeV",/,31("="),/, &
        &69x,"B(Tl:i->f)",/, &
        &1x,1a4,1x,"Pi",2x,"ni",3x,"Ei_ex",1x,1a4,1x,"Pf",2x,"nf",3x,"Ef_ex",&
@@ -1384,16 +1424,17 @@ do i = 2, states_imax
   ni = states_tabijp(i,1)
   ji = states_tabijp(i,2)
   pi = states_tabijp(i,3)
+  if ( states_notzero(ni,ji,pi) == 0 ) cycle
+
   ei = states_ener(ni,ji,pi)
   exci = ei - ener_gs
-
-  if ( ei > -zero_eps ) cycle
-  if ( ni > 999 ) cycle
 
   do f = 1, i-1
     nf = states_tabijp(f,1)
     jf = states_tabijp(f,2)
     pf = states_tabijp(f,3)
+    if ( states_notzero(nf,jf,pf) == 0 ) cycle
+
     ef = states_ener(nf,jf,pf)
     excf = ef - ener_gs
 
@@ -1403,7 +1444,6 @@ do i = 2, states_imax
    
     if ( abs(dj) > 3 ) cycle
     if ( (abs(dj) > 2) .and. (dp == 1) ) cycle
-    if ( nf > 999 ) cycle
 
     !!! Inverse the indices if necessary (order of loop on j,p in the code)
     if ( (dj < 0) .or. ((dj == 0) .and. (pi == +1) .and. (pf == -1)) ) then 
@@ -1427,7 +1467,7 @@ do i = 2, states_imax
     ltmax = max(abs(ji-jf),ji+jf)
     tprem = 0 
 
-    do k = 0, 5
+    do k = 1, 5
 
       reduced_me = zero
       proba_fm = zero
@@ -1435,14 +1475,14 @@ do i = 2, states_imax
 
       !!! Select the type of transition
       select case (k)
+        ! ATTENTION: never benchmarked. Need to check definition & factor!
         case (0)
-          ! ATTENTION: never benchmarked. Need to check definition & factor!
           namet = 'E0'
           lt = 0
           pt = +1  
           mdj = max(-lt/2,dj)
           reduced_me = transi_r2p(n1,n2,j1,p1,mdj) * sqrt(j1 + one)
-          factor_conv = (radius_r0 * nucleus_A)**4
+          factor_conv = (radius_r0 * hwg_An)**4
 
         case (1)
           if ( .not. do_E1 ) cycle
@@ -1451,7 +1491,7 @@ do i = 2, states_imax
           pt = -1  
           mdj = max(-lt/2,dj)
           reduced_me = transi_E1(n1,n2,j1,p1,mdj)
-          factor_conv = 0.06446d0 * (nucleus_A**(2.d0/3.d0))
+          factor_conv = 0.06446d0 * (hwg_An**(2.d0/3.d0))
 
         case (2)
           if ( .not. do_E2 ) cycle
@@ -1460,7 +1500,7 @@ do i = 2, states_imax
           pt = +1  
           mdj = max(-lt/2,dj)
           reduced_me = transi_E2(n1,n2,j1,p1,mdj)
-          factor_conv = 0.05940d0 * (nucleus_A**(4.d0/3.d0))
+          factor_conv = 0.05940d0 * (hwg_An**(4.d0/3.d0))
 
         case (3)
           if ( .not. do_E3 ) cycle
@@ -1469,7 +1509,7 @@ do i = 2, states_imax
           pt = -1  
           mdj = max(-lt/2,dj)
           reduced_me = transi_E3(n1,n2,j1,p1,mdj)
-          factor_conv = 0.05940d0 * (nucleus_A**(6.d0/3.d0))
+          factor_conv = 0.05940d0 * (hwg_An**(6.d0/3.d0))
  
         case (4)
           if ( .not. do_M1 ) cycle
@@ -1487,7 +1527,7 @@ do i = 2, states_imax
           pt = -1  
           mdj = max(-lt/2,dj)
           reduced_me = transi_M2(n1,n2,j1,p1,mdj)
-          factor_conv = 1.650d0 * (nucleus_A**(2.d0/3.d0))
+          factor_conv = 1.650d0 * (hwg_An**(2.d0/3.d0))
       end select
 
       if ( dp /= pt ) cycle
@@ -1528,9 +1568,9 @@ enddo
 !!!
 !!! Transition sorted by spin-parity
 !!!
-write(utd2,'(67x,"B(Tl:i->f)",/, &
+write(utd2,'(69x,"B(Tl:i->f)",/, &
         &3x,"Ji",1x,"Pi",2x,"ni",3x,"Ei_ex",3x,"Jf",1x,"Pf",2x,"nf",3x,"Ef_ex",&
-        &3x,"Ei-Ef",4x,"Type",6x,"(e fm)",8x,"(wu)",/,83("-"))')
+        &3x,"Ei-Ef",4x,"Type",7x,"(e fm)",10x,"(wu)",/,87("-"))')
 
 do ji = hwg_2jmin, hwg_2jmax, 2 
   do pi = hwg_pmax, hwg_pmin, -2
@@ -1546,16 +1586,18 @@ do ji = hwg_2jmin, hwg_2jmax, 2
         if ( (abs(dj) > 2) .and. (dp == 1) ) cycle
 
         do ni = 1, projme_tdim
+          if ( states_notzero(ni,ji,pi) == 0 ) cycle
+
           ei = states_ener(ni,ji,pi)
-          if ( ei > -zero_eps ) cycle
-          if ( ni > 999 ) cycle
+          exci = ei - ener_gs
 
           do nf = 1, projme_tdim
-            ef = states_ener(nf,jf,pf)
+            if ( states_notzero(nf,jf,pf) == 0 ) cycle
+
+            ef = states_ener(nf,jf,pf) 
+            excf = ef - ener_gs
             de = ei - ef
             if ( de <= zero ) cycle
-            if ( ef > -zero_eps ) cycle
-            if ( nf > 999 ) cycle
 
             !!! Inverse the indices if necessary (order of loops on j,p)
             if ( (dj < 0) .or. ((dj == 0) .and. (pi == +1) .and. &
@@ -1580,7 +1622,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
             ltmax = max(abs(ji-jf),ji+jf)
             tprem = 0 
         
-            do k = 0, 5
+            do k = 1, 5
         
               reduced_me = zero
               proba_fm = zero
@@ -1588,13 +1630,14 @@ do ji = hwg_2jmin, hwg_2jmax, 2
         
               !!! Select the type of transition
               select case (k)
+                ! Never benchmarked. Need to check definition & factor!
                 case (0)
                   namet = 'E0'
                   lt = 0
                   pt = +1  
                   mdj = max(-lt/2,dj)
                   reduced_me = transi_r2p(n1,n2,j1,p1,mdj) * sqrt(j1 + one)
-                  factor_conv = (radius_r0 * nucleus_A)**4
+                  factor_conv = (radius_r0 * hwg_An)**4
         
                 case (1)
                   if ( .not. do_E1 ) cycle
@@ -1603,7 +1646,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   pt = -1  
                   mdj = max(-lt/2,dj)
                   reduced_me = transi_E1(n1,n2,j1,p1,mdj)
-                  factor_conv = 0.06446d0 * (nucleus_A**(2.d0/3.d0))
+                  factor_conv = 0.06446d0 * (hwg_An**(2.d0/3.d0))
         
                 case (2)
                   if ( .not. do_E2 ) cycle
@@ -1612,7 +1655,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   pt = +1  
                   mdj = max(-lt/2,dj)
                   reduced_me = transi_E2(n1,n2,j1,p1,mdj)
-                  factor_conv = 0.05940d0 * (nucleus_A**(4.d0/3.d0))
+                  factor_conv = 0.05940d0 * (hwg_An**(4.d0/3.d0))
         
                 case (3)
                   if ( .not. do_E3 ) cycle
@@ -1621,7 +1664,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   pt = -1  
                   mdj = max(-lt/2,dj)
                   reduced_me = transi_E3(n1,n2,j1,p1,mdj)
-                  factor_conv = 0.05940d0 * (nucleus_A**(6.d0/3.d0))
+                  factor_conv = 0.05940d0 * (hwg_An**(6.d0/3.d0))
          
                 case (4)
                   if ( .not. do_M1 ) cycle
@@ -1639,7 +1682,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   pt = -1  
                   mdj = max(-lt/2,dj)
                   reduced_me = transi_M2(n1,n2,j1,p1,mdj)
-                  factor_conv = 1.650d0 * (nucleus_A**(2.d0/3.d0))
+                  factor_conv = 1.650d0 * (hwg_An**(2.d0/3.d0))
               end select
         
               if ( dp /= pt ) cycle

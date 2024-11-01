@@ -38,7 +38,7 @@ subroutine print_version
 print '(" __________________________________________________________",/, &
       & "|                                                          |",/, &
       & "|  (______)                                                |",/, &
-      & "|  <(0  0)>   TAURUS_mix, version 2024.10.23               |",/, &
+      & "|  <(0  0)>   TAURUS_mix, version 2024.11.01               |",/, &
       & "|    (°°)                                                  |",/, &
       & "|                                                          |",/, &
       & "| This code performs the configuration mixing of symmetry  |",/, &
@@ -85,8 +85,8 @@ read(uti,format3) input_names(8),  hwg_Edis
 read(uti,format1) input_names(9) 
 read(uti,format1) input_names(10)
 read(uti,format1) input_names(11)
-read(uti,format3) input_names(12), hwg_Z
-read(uti,format3) input_names(13), hwg_N
+read(uti,format3) input_names(12), hwg_Zv
+read(uti,format3) input_names(13), hwg_Nv
 read(uti,format3) input_names(14), hwg_Zc
 read(uti,format3) input_names(15), hwg_Nc
 read(uti,format3) input_names(16), hwg_2jmin
@@ -142,7 +142,10 @@ enddo
 !!! Special values 
 call set_characters_JP
 
-hwg_A  = hwg_Z  + hwg_N
+hwg_Zn = hwg_Zv + hwg_Zc
+hwg_Nn = hwg_Nv + hwg_Nc
+hwg_An = hwg_Zn + hwg_Nn
+hwg_Av = hwg_Zv + hwg_Nv
 hwg_Ac = hwg_Zc + hwg_Nc
 
 if ( hwg_Edis == 0 ) hwg_Edis=20
@@ -164,7 +167,7 @@ end subroutine read_input
 subroutine print_input
 
 integer :: i
-character(3) :: hwg_Z_ch, hwg_N_ch, hwg_Zc_ch, hwg_Nc_ch, hwg_2jmin_ch, & 
+character(3) :: hwg_Zv_ch, hwg_Nv_ch, hwg_Zc_ch, hwg_Nc_ch, hwg_2jmin_ch, & 
                 hwg_2jmax_ch, hwg_pmin_ch, hwg_pmax_ch, hwg_Edis_ch
 character(5) :: hwg_echp_ch, hwg_echn_ch, cutoff_ldim_ch, cutoff_spec_dim_ch
 character(10) :: cutoff_over_ch, cutoff_ener_ch, cutoff_negev_ch, & 
@@ -179,8 +182,8 @@ character(len=*), parameter :: format1 = '(1a)', &
                                format7 = '(1a30,1a1,2i3,1i19,1i3)'
 
 !!! Formats the variable to eliminate the unpleasant blank spaces
-write(hwg_Z_ch,'(1i3)') hwg_Z  
-write(hwg_N_ch,'(1i3)') hwg_N
+write(hwg_Zv_ch,'(1i3)') hwg_Zv  
+write(hwg_Nv_ch,'(1i3)') hwg_Nv
 write(hwg_Zc_ch,'(1i3)') hwg_Zc
 write(hwg_Nc_ch,'(1i3)') hwg_Nc
 write(hwg_2jmin_ch,'(1i3)') hwg_2jmin  
@@ -190,8 +193,8 @@ write(hwg_pmax_ch,'(1i3)') hwg_pmax
 write(hwg_echp_ch,'(1f5.2)') hwg_echp  
 write(hwg_echn_ch,'(1f5.2)') hwg_echn  
 write(hwg_Edis_ch,'(1i3)') hwg_Edis  
-hwg_Z_ch = adjustl(hwg_Z_ch)
-hwg_N_ch = adjustl(hwg_N_ch)
+hwg_Zv_ch = adjustl(hwg_Zv_ch)
+hwg_Nv_ch = adjustl(hwg_Nv_ch)
 hwg_Zc_ch = adjustl(hwg_Zc_ch)
 hwg_Nc_ch = adjustl(hwg_Nc_ch)
 hwg_2jmin_ch = adjustl(hwg_2jmin_ch)
@@ -233,8 +236,8 @@ write(uto,format3) input_names(8),  hwg_Edis_ch
 write(uto,format1) input_names(9)  
 write(uto,format1) input_names(10)
 write(uto,format1) input_names(11) 
-write(uto,format3) input_names(12), hwg_Z_ch     
-write(uto,format3) input_names(13), hwg_N_ch     
+write(uto,format3) input_names(12), hwg_Zv_ch     
+write(uto,format3) input_names(13), hwg_Nv_ch     
 write(uto,format3) input_names(14), hwg_Zc_ch     
 write(uto,format3) input_names(15), hwg_Nc_ch     
 write(uto,format3) input_names(16), hwg_2jmin_ch
@@ -332,15 +335,15 @@ endif
 !!! Quantum numbers    
 !!!
 
-if ( hwg_Z < 0 ) then
+if ( hwg_Zv < 0 ) then
   ierror = ierror + 1
-  print "(a,1i3,a)","The number of active protons (hwg_Z) = ",hwg_Z, &
+  print "(a,1i3,a)","The number of active protons (hwg_Zv) = ",hwg_Zv, &
         " should be positive or null."
 endif 
 
-if ( hwg_N < 0 ) then
+if ( hwg_Nv < 0 ) then
   ierror = ierror + 1
-  print "(a,1i3,a)","The number of active neutrons (hwg_N) = ",hwg_N, &
+  print "(a,1i3,a)","The number of active neutrons (hwg_Nv) = ",hwg_Nv, &
         " should be positive or null."
 endif 
 
@@ -354,6 +357,18 @@ if ( hwg_Nc < 0 ) then
   ierror = ierror + 1
   print "(a,1i3,a)","The number of core neutrons (hwg_Nc) = ",hwg_Nc, &
         " should be positive or null."
+endif 
+
+if ( hwg_Zn <= 0 ) then
+  ierror = ierror + 1
+  print "(a,1i3,a)","The total number of protons (hwg_Zn) = ",hwg_Zn, &
+        " should be strictly positive."
+endif 
+
+if ( hwg_Nn <= 0 ) then
+  ierror = ierror + 1
+  print "(a,1i3,a)","The total number of neutrons (hwg_Nn) = ",hwg_Nn, &
+        " should be strictly positive."
 endif 
 
 if ( hwg_2jmin < 0 ) then
@@ -384,10 +399,10 @@ endif
 
 ! Deactivated: when no projection, everything is written as J=0, even for
 ! odd-A nuclei. This test stops the code.
-!if ( (-1)**(hwg_N+hwg_Z) /= (-1)**hwg_2jmin ) then
+!if ( (-1)**(hwg_N+hwg_Zv) /= (-1)**hwg_2jmin ) then
 !  ierror = ierror + 1
-!  print "(a,1i2,a,1i2,a)","The number parity (-1**(hwg_N+hwg_Z)) = ", &
-!        (-1)**(hwg_N+hwg_Z)," should be equal to the number parity &
+!  print "(a,1i2,a,1i2,a)","The number parity (-1**(hwg_Nv+hwg_Zv)) = ", &
+!        (-1)**(hwg_Nv+hwg_Zv)," should be equal to the number parity &
 !        &(-1**hwg_2jmin) = ",(-1)**hwg_2jmin,"."
 !endif 
 

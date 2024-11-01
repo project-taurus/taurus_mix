@@ -279,9 +279,9 @@ do
   if ( abs(xover) < cutoff_block_over(n2j,np) ) icut = 1 
   if ( xener/xover > cutoff_block_ener(n2j,np) ) icut = 1 
   if ( abs(xj - 0.5d0*block_2j) > cutoff_block_J(n2j,np) ) icut = 1
-  if ( abs(xprot/xover - hwg_Z) > cutoff_block_A(n2j,np) ) icut = 1
-  if ( abs(xneut/xover - hwg_N) > cutoff_block_A(n2j,np) ) icut = 1
-  !if ( abs(xnucl/xover - hwg_A) > cutoff_block_A(n2j,np) ) cycle 
+  if ( abs(xprot/xover - hwg_Zv) > cutoff_block_A(n2j,np) ) icut = 1
+  if ( abs(xneut/xover - hwg_Nv) > cutoff_block_A(n2j,np) ) icut = 1
+  !if ( abs(xnucl/xover - hwg_Av) > cutoff_block_A(n2j,np) ) cycle 
  
   if ( icut == 1 ) then
     hkj = n2kj
@@ -818,10 +818,14 @@ do i = 1, 5
       if ( i <= 3 ) then 
         read(utbl,iostat=iexit) label_1, label_2, j1, kj1, p1, j2, kj2, p2, &
                                 xredp, xredn
-     
-        ! E1 effective charge to remove com contamination, from appendix B
-        ! in Ring and Schuck.    
-        if ( i == 1 ) then
+    
+        ! Effective charges: general case
+        if ( i /= 1 ) then
+          xred = hwg_echp * xredp + hwg_echn * xredn
+         
+        ! E1 caser: special attention to com contamination,
+        ! see appendix B in Ring and Schuck
+        elseif ( i == 1 ) then
      
           if ( hwg_Ac == 0 ) then 
             echn = hwg_echp
@@ -829,8 +833,8 @@ do i = 1, 5
             echn = hwg_echn
           endif
 
-          xred =  (hwg_N * hwg_echp / hwg_A) * xredp &
-                - (hwg_Z *     echn / hwg_A) * xredn
+          xred =  (hwg_Nv * hwg_echp / hwg_Av) * xredp &
+                - (hwg_Zv *     echn / hwg_Av) * xredn
         endif
 
       else                 

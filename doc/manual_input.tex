@@ -87,7 +87,7 @@ Line & Format & Data \\
 where 
 \begin{itemize}
 \item \ttt{hwg\_phys}: physical case studied. \\[0.05cm]
- \ttt{= 0\:} excitation spectrum and $\gamma$ spectrosocpy (ELM transiions: E0-3, M1-2). 
+ \ttt{= 0\:} excitation spectrum and $\gamma$ spectrosocpy (ELM transiions: E1-3, M1-2). 
 \item \ttt{hwg\_algo}: algorithm used to solve the HWG equation. \\[0.05cm]
  \ttt{= 0\:} reduction to a standard eigenvalue problem through the calculation of the square root of the norm matrix. \\[0.05cm]
  \ttt{= 1\:} QZ algorithm (as implemented in LAPACK).
@@ -136,8 +136,8 @@ Line & Format & Data \\
 \hline
  \textbf{10}   & 1a           & \tt input\_names(10)              \\
  \textbf{11}   & 1a           & \tt input\_names(11)              \\
- \textbf{12}   & 1a30, 1i3    & \tt input\_names(12), hwg\_Z      \\
- \textbf{13}   & 1a30, 1i3    & \tt input\_names(13), hwg\_N      \\
+ \textbf{12}   & 1a30, 1i3    & \tt input\_names(12), hwg\_Zv     \\
+ \textbf{13}   & 1a30, 1i3    & \tt input\_names(13), hwg\_Nv     \\
  \textbf{14}   & 1a30, 1i3    & \tt input\_names(14), hwg\_Zc     \\
  \textbf{15}   & 1a30, 1i3    & \tt input\_names(15), hwg\_Nc     \\
  \textbf{16}   & 1a30, 1i3    & \tt input\_names(16), hwg\_2jmax  \\
@@ -152,8 +152,8 @@ Line & Format & Data \\
 \end{center}
 where
 \begin{itemize}
- \item \ttt{hwg\_Z}: number of active protons (after particle-number projection on the ket).
- \item \ttt{hwg\_N}: number of active neutrons (same as above). 
+ \item \ttt{hwg\_Zv}: number of active protons (after particle-number projection on the ket).
+ \item \ttt{hwg\_Nv}: number of active neutrons (same as above). 
  \item \ttt{hwg\_Zc}: number of core protons.
  \item \ttt{hwg\_Nc}: number of core neutrons. 
  \item \ttt{hwg\_2jmin}: minimum value of the angular momentum $2J$ considered.
