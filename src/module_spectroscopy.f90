@@ -1378,7 +1378,7 @@ end subroutine print_spectrum
 subroutine print_transitions_elm
 
 integer :: i, f, k, ni, nf, ji, jf, dj, pi, pf, dp, lt, pt, ltmin, ltmax, & 
-           n1, n2, j1, j2, p1, p2, mdj, jfmin, jfmax, tprem
+           n1, n2, j1, j2, dj12, p1, p2, mdj, jfmin, jfmax, tprem
 real(r64) :: ei, ef, de, exci, excf, ener_gs, proba_fm, proba_wu, reduced_me, &
              factor_conv
 character(1) :: chPi, chPf
@@ -1602,6 +1602,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
             !!! Inverse the indices if necessary (order of loops on j,p)
             if ( (dj < 0) .or. ((dj == 0) .and. (pi == +1) .and. &
                                 (pf == -1)) ) then 
+              dj12 = +dj
               n1 = nf 
               n2 = ni 
               j1 = jf
@@ -1609,7 +1610,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
               p1 = pf
               p2 = pi
             else 
-              dj = -dj
+              dj12 = -dj
               n1 = ni 
               n2 = nf
               j1 = ji
@@ -1635,7 +1636,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   namet = 'E0'
                   lt = 0
                   pt = +1  
-                  mdj = max(-lt/2,dj)
+                  mdj = max(-lt/2,dj12)
                   reduced_me = transi_r2p(n1,n2,j1,p1,mdj) * sqrt(j1 + one)
                   factor_conv = (radius_r0 * hwg_An)**4
         
@@ -1644,7 +1645,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   namet = 'E1'
                   lt = 2
                   pt = -1  
-                  mdj = max(-lt/2,dj)
+                  mdj = max(-lt/2,dj12)
                   reduced_me = transi_E1(n1,n2,j1,p1,mdj)
                   factor_conv = 0.06446d0 * (hwg_An**(2.d0/3.d0))
         
@@ -1653,7 +1654,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   namet = 'E2'
                   lt = 4
                   pt = +1  
-                  mdj = max(-lt/2,dj)
+                  mdj = max(-lt/2,dj12)
                   reduced_me = transi_E2(n1,n2,j1,p1,mdj)
                   factor_conv = 0.05940d0 * (hwg_An**(4.d0/3.d0))
         
@@ -1662,7 +1663,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   namet = 'E3'
                   lt = 6
                   pt = -1  
-                  mdj = max(-lt/2,dj)
+                  mdj = max(-lt/2,dj12)
                   reduced_me = transi_E3(n1,n2,j1,p1,mdj)
                   factor_conv = 0.05940d0 * (hwg_An**(6.d0/3.d0))
          
@@ -1671,7 +1672,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   namet = 'M1'
                   lt = 2
                   pt = +1  
-                  mdj = max(-lt/2,dj)
+                  mdj = max(-lt/2,dj12)
                   reduced_me = transi_M1(n1,n2,j1,p1,mdj)
                   factor_conv = 1.790d0
         
@@ -1680,11 +1681,11 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   namet = 'M2'
                   lt = 4
                   pt = -1  
-                  mdj = max(-lt/2,dj)
+                  mdj = max(-lt/2,dj12)
                   reduced_me = transi_M2(n1,n2,j1,p1,mdj)
                   factor_conv = 1.650d0 * (hwg_An**(2.d0/3.d0))
               end select
-        
+
               if ( dp /= pt ) cycle
               if ( (lt < ltmin) .or. (lt > ltmax) ) cycle
         

@@ -235,7 +235,7 @@ integer, dimension(1) :: loclab
 real(r64) :: xover, xener, xpari, xprot, xneut, xnucl, xamj2, xamsp, xamsn, &
              xist2, xr2p, xr2n, xr2m, xj, xt
 logical :: is_new_state, is_new_label
-character(len=*), parameter :: format1 = "(1i19,1i5,1f12.8,1f12.5,4f12.6,& 
+character(len=*), parameter :: format1 = "(1i19,1i5,1f12.8,1f12.5,1x,4f12.6,& 
                                           &2f10.5)"
 
 !!! Initialization
@@ -291,7 +291,7 @@ do
       if ( cutdisp == 0 ) then
         cutdisp = 1
         print '(/,"States discarded",/,16("="),//, &
-              &7x,"Label",9x,1a3,3x,"Overlap",7x,"Energy",8x,"P",11x,"Z",&
+              &7x,"Label",9x,1a3,3x,"Overlap",7x,"Energy",9x,"P",11x,"Z",&
               &11x,"N",11x,"A",10x,"J",9x,"T",/,116("-"))',char_Kleg
       endif
       write(uto,format1) label_r, hkj, xover, xener/xover, xpari/xover, &
@@ -465,13 +465,13 @@ integer, intent(in) :: block_p
 integer :: i, j, kj, hkj, bdim
 integer(i64) :: label 
 real(r64) :: xover, xener, xpari, xprot, xneut, xnucl, xamj2, xist2, xj, xt
-character(len=*), parameter :: format1 = "(1i5,1x,1i19,1i5,1f12.8,1f12.5, &
+character(len=*), parameter :: format1 = "(1i5,1x,1i19,1i5,1f12.8,1x,1f12.5, &
                                           &4f12.6,2f10.5)", &
                                format2 = "(1i5,3x,1i5)"
 
 print '(/,"States selected",/,15("="),//, &
-       &"Index",8x,"Label",9x,1a3,3x,"Overlap",7x,"Energy",8x,"P",11x,"Z", &
-       &11x,"N",11x,"A",10x,"J",9x,"T",/,122("-"))',char_Kleg
+       &"Index",8x,"Label",9x,1a3,3x,"Overlap",7x,"Energy",9x,"P",11x,"Z", &
+       &11x,"N",11x,"A",10x,"J",9x,"T",/,123("-"))',char_Kleg
 
 do i = 1, projme_bdim(0,block_p,1)
   label = projme_label(i,0,block_p,1)
