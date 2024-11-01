@@ -896,7 +896,7 @@ do dj = djmin, 0, 2
     !!! Weights of the final states 
     Ff(:,:) = weights_f(:,:,dj/2,pf,1)
 
-    do k = 0, 5
+    do k = 1, 5
       select case (k)
         !!! E0
         case (0)
@@ -1481,7 +1481,7 @@ do i = 2, states_imax
           lt = 0
           pt = +1  
           mdj = max(-lt/2,dj)
-          reduced_me = transi_r2p(n1,n2,j1,p1,mdj) * sqrt(j1 + one)
+          reduced_me = transi_r2p(n2,n1,j1,p1,mdj) * sqrt(j1 + one)
           factor_conv = (radius_r0 * hwg_An)**4
 
         case (1)
@@ -1490,7 +1490,7 @@ do i = 2, states_imax
           lt = 2
           pt = -1  
           mdj = max(-lt/2,dj)
-          reduced_me = transi_E1(n1,n2,j1,p1,mdj)
+          reduced_me = transi_E1(n2,n1,j1,p1,mdj)
           factor_conv = 0.06446d0 * (hwg_An**(2.d0/3.d0))
 
         case (2)
@@ -1499,7 +1499,7 @@ do i = 2, states_imax
           lt = 4
           pt = +1  
           mdj = max(-lt/2,dj)
-          reduced_me = transi_E2(n1,n2,j1,p1,mdj)
+          reduced_me = transi_E2(n2,n1,j1,p1,mdj)
           factor_conv = 0.05940d0 * (hwg_An**(4.d0/3.d0))
 
         case (3)
@@ -1508,7 +1508,7 @@ do i = 2, states_imax
           lt = 6
           pt = -1  
           mdj = max(-lt/2,dj)
-          reduced_me = transi_E3(n1,n2,j1,p1,mdj)
+          reduced_me = transi_E3(n2,n1,j1,p1,mdj)
           factor_conv = 0.05940d0 * (hwg_An**(6.d0/3.d0))
  
         case (4)
@@ -1517,7 +1517,7 @@ do i = 2, states_imax
           lt = 2
           pt = +1  
           mdj = max(-lt/2,dj)
-          reduced_me = transi_M1(n1,n2,j1,p1,mdj)
+          reduced_me = transi_M1(n2,n1,j1,p1,mdj)
           factor_conv = 1.790d0
 
         case (5)
@@ -1526,7 +1526,7 @@ do i = 2, states_imax
           lt = 4
           pt = -1  
           mdj = max(-lt/2,dj)
-          reduced_me = transi_M2(n1,n2,j1,p1,mdj)
+          reduced_me = transi_M2(n2,n1,j1,p1,mdj)
           factor_conv = 1.650d0 * (hwg_An**(2.d0/3.d0))
       end select
 
@@ -1637,7 +1637,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   lt = 0
                   pt = +1  
                   mdj = max(-lt/2,dj12)
-                  reduced_me = transi_r2p(n1,n2,j1,p1,mdj) * sqrt(j1 + one)
+                  reduced_me = transi_r2p(n2,n1,j1,p1,mdj) * sqrt(j1 + one)
                   factor_conv = (radius_r0 * hwg_An)**4
         
                 case (1)
@@ -1646,7 +1646,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   lt = 2
                   pt = -1  
                   mdj = max(-lt/2,dj12)
-                  reduced_me = transi_E1(n1,n2,j1,p1,mdj)
+                  reduced_me = transi_E1(n2,n1,j1,p1,mdj)
                   factor_conv = 0.06446d0 * (hwg_An**(2.d0/3.d0))
         
                 case (2)
@@ -1655,7 +1655,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   lt = 4
                   pt = +1  
                   mdj = max(-lt/2,dj12)
-                  reduced_me = transi_E2(n1,n2,j1,p1,mdj)
+                  reduced_me = transi_E2(n2,n1,j1,p1,mdj)
                   factor_conv = 0.05940d0 * (hwg_An**(4.d0/3.d0))
         
                 case (3)
@@ -1664,7 +1664,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   lt = 6
                   pt = -1  
                   mdj = max(-lt/2,dj12)
-                  reduced_me = transi_E3(n1,n2,j1,p1,mdj)
+                  reduced_me = transi_E3(n2,n1,j1,p1,mdj)
                   factor_conv = 0.05940d0 * (hwg_An**(6.d0/3.d0))
          
                 case (4)
@@ -1673,7 +1673,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   lt = 2
                   pt = +1  
                   mdj = max(-lt/2,dj12)
-                  reduced_me = transi_M1(n1,n2,j1,p1,mdj)
+                  reduced_me = transi_M1(n2,n1,j1,p1,mdj)
                   factor_conv = 1.790d0
         
                 case (5)
@@ -1682,7 +1682,7 @@ do ji = hwg_2jmin, hwg_2jmax, 2
                   lt = 4
                   pt = -1  
                   mdj = max(-lt/2,dj12)
-                  reduced_me = transi_M2(n1,n2,j1,p1,mdj)
+                  reduced_me = transi_M2(n2,n1,j1,p1,mdj)
                   factor_conv = 1.650d0 * (hwg_An**(2.d0/3.d0))
               end select
 

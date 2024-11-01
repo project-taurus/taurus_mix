@@ -758,8 +758,8 @@ end subroutine read_projmatelem_occnumb
 subroutine read_projmatelem_transitions_elm(block_2j,block_p)
 
 integer, intent(in) :: block_2j, block_p
-integer :: i, jf, kjf, tf, ktf, pf, ji, kji, ti, kti, pi, &
-           m, j1, kj1, t1, kt1, p1, j2, kj2, t2, kt2, p2, &
+integer :: i, jf, kjf, ktf, pf, ji, kji, kti, pi, &
+           m, j1, kj1, kt1, p1, j2, kj2, kt2, p2, &
            lt, idx_i, idx_f, dj, utbl, iexit
 integer(i64) :: label_f, label_i, label_1, label_2
 integer, dimension(1) :: loclab
@@ -869,8 +869,6 @@ do i = 1, 5
         ji = j2
         kjf = kj1
         kji = kj2
-        tf = t1
-        ti = t2
         ktf = kt1
         kti = kt2
         pf = p1
@@ -883,8 +881,6 @@ do i = 1, 5
         ji = j1
         kjf = kj2
         kji = kj1
-        tf = t2
-        ti = t1
         ktf = kt2
         kti = kt1
         pf = p2
